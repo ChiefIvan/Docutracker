@@ -6,6 +6,8 @@
     theDocument,
     location,
     searchArray,
+    appDate,
+    comDate,
   } from "../../store";
 
   let focused = false;
@@ -47,6 +49,8 @@
 
                 $theDocument = { name: value.documentName, id: value.codeData };
                 $documentSelected = "";
+
+                window.location.reload();
               }}
               class:dark={$dark}
             >

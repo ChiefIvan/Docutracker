@@ -26,47 +26,46 @@
   let completeArrayOr: Document[] = [];
   let rejectedArrayOr: Document[] = [];
 
-  afterUpdate(() => {
-    forwardArrayOr = $documents.filter(
-      (document) =>
-        !document.documentPath.length ||
-        document.documentPath.some(
-          (path) => path.approved && path.confirmed && !path.finished
-        )
-    );
+  $: forwardArrayOr = $documents.filter(
+    (document) =>
+      !document.documentPath.length ||
+      (document.documentPath[document.documentPath.length - 1].approved &&
+        document.documentPath[document.documentPath.length - 1].confirmed &&
+        !document.documentPath[document.documentPath.length - 1].finished &&
+        !document.documentPath[document.documentPath.length - 1].complete)
+  );
 
-    approvedArrayOr = $documents.filter(
-      (document) =>
-        document.documentPath.length &&
-        document.documentPath.some(
-          (path) => path.approved && !path.confirmed && !path.finished
-        )
-    );
+  $: approvedArrayOr = $documents.filter(
+    (document) =>
+      document.documentPath.length &&
+      document.documentPath[document.documentPath.length - 1].approved &&
+      !document.documentPath[document.documentPath.length - 1].confirmed &&
+      !document.documentPath[document.documentPath.length - 1].finished
+  );
 
-    waitingArrayOr = $documents.filter(
-      (document) =>
-        document.documentPath.length &&
-        document.documentPath.some(
-          (path) =>
-            path.approved && !path.confirmed && path.finished && !path.complete
-        )
-    );
+  $: waitingArrayOr = $documents.filter(
+    (document) =>
+      document.documentPath.length &&
+      document.documentPath[document.documentPath.length - 1].approved &&
+      document.documentPath[document.documentPath.length - 1].confirmed &&
+      document.documentPath[document.documentPath.length - 1].finished &&
+      !document.documentPath[document.documentPath.length - 1].complete
+  );
 
-    completeArrayOr = $documents.filter(
-      (document) =>
-        document.documentPath.length &&
-        document.documentPath.some(
-          (path) =>
-            path.approved && !path.confirmed && path.finished && path.complete
-        )
-    );
+  $: completeArrayOr = $documents.filter(
+    (document) =>
+      document.documentPath.length &&
+      document.documentPath[document.documentPath.length - 1].approved &&
+      document.documentPath[document.documentPath.length - 1].confirmed &&
+      document.documentPath[document.documentPath.length - 1].finished &&
+      document.documentPath[document.documentPath.length - 1].complete
+  );
 
-    rejectedArrayOr = $documents.filter(
-      (document) =>
-        document.documentPath.length &&
-        document.documentPath.some((path) => !path.approved)
-    );
-  });
+  $: rejectedArrayOr = $documents.filter(
+    (document) =>
+      document.documentPath.length &&
+      !document.documentPath[document.documentPath.length - 1].approved
+  );
 
   let sortName = "Default";
   let searchValue = "";

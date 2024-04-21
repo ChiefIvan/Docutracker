@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import {
     handleFetch,
     address,
@@ -219,9 +219,335 @@
       insName = name;
     }
   };
+</script> -->
+
+<script lang="ts">
+  import {
+    handleFetch,
+    address,
+    dark,
+    userData,
+    detailsExpand,
+    users,
+    filterExpand,
+    filterName,
+    sortExpand,
+    type RequestAPI,
+    type ResponseData,
+    type Users,
+  } from "../../store";
+  import { navigate } from "svelte-routing";
+  import { onMount, createEventDispatcher, type EventDispatcher } from "svelte";
+  import { tooltip } from "../shared/Tooltip";
+  import { fade } from "svelte/transition";
+
+  import DocumentModal from "./DocumentModal.svelte";
+  import Dropdown from "../shared/Dropdown.svelte";
+  import TriangleIcon from "../icons/TriangleIcon.svelte";
+  import UserCard from "./UserCard.svelte";
+
+  type EventDispatcher<T> = (eventname: string, eventData: T) => void;
+  const dispatch: EventDispatcher<string> = createEventDispatcher();
+
+  // const handleDispatch = (item: string) => {
+  //   dispatch("tabChange", item);
+  // };
+
+  export let authToken: string;
+
+  const indexAddress = `${address}/get_all`;
+  const indexMethod = "GET";
+
+  let insName = "";
+  let documents: any[] = [];
+
+  const authRequest: RequestAPI = {
+    method: indexMethod,
+    address: indexAddress,
+  };
+
+  let route: string | undefined;
+
+  async function fetchDataAndDispatch() {
+    if (!authToken.length) {
+      console.warn("Auth Token is empty");
+      navigate("/auth/login");
+      return;
+    }
+
+    try {
+      const response: ResponseData = await handleFetch(authRequest, authToken);
+
+      if (response && response.users) {
+        $users = response.users;
+        route = response.unit;
+      }
+
+      console.log($userData);
+
+      $users.forEach((user) => {
+        let isValid = user.documents.some((doc) => {
+          if (!doc.documentPath.length) {
+            if ($userData.unit === "Program Head") {
+              if (
+                doc.documentName === "Faculty Loading" ||
+                doc.documentName === "Requested Subject" ||
+                doc.documentName === "Endorsement Form" ||
+                doc.documentName === "Application for Leave"
+              ) {
+                return true;
+              }
+            }
+
+            if ($userData.unit === "Dean Office") {
+              if (user.unit === "Program Head") {
+                if (doc.documentName === "Application for Leave") {
+                  return true;
+                }
+              }
+            }
+
+            if ($userData.unit === "HROS") {
+              if (user.unit === "Dean Office") {
+                if (doc.documentName === "Application for Leave") {
+                  return true;
+                }
+              }
+            }
+
+            return false;
+          } else if (doc.documentPath.length) {
+            if (
+              doc.documentPath[doc.documentPath.length - 1].name ===
+                "Program Head" &&
+              doc.documentPath[doc.documentPath.length - 1].approved &&
+              !doc.documentPath[doc.documentPath.length - 1].confirmed
+            ) {
+              if (
+                doc.documentName === "Faculty Loading" ||
+                doc.documentName === "Requested Subject" ||
+                doc.documentName === "Endorsement Form"
+              ) {
+                return true;
+              }
+            }
+
+            if (
+              doc.documentPath[doc.documentPath.length - 1].name ===
+                "Program Head" &&
+              doc.documentPath[doc.documentPath.length - 1].approved &&
+              doc.documentPath[doc.documentPath.length - 1].confirmed
+            ) {
+              if ($userData.unit === "Dean Office") {
+                if (
+                  doc.documentName === "Faculty Loading" ||
+                  doc.documentName === "Requested Subject" ||
+                  doc.documentName === "Endorsement Form"
+                ) {
+                  return true;
+                }
+              }
+
+              if ($userData.unit === "HROS") {
+                if (doc.documentName === "Application for Leave") {
+                  return true;
+                }
+              }
+            }
+
+            if (
+              doc.documentPath[doc.documentPath.length - 1].name ===
+                "Dean Office" &&
+              doc.documentPath[doc.documentPath.length - 1].approved &&
+              !doc.documentPath[doc.documentPath.length - 1].confirmed
+            ) {
+              if (
+                doc.documentName === "Faculty Loading" ||
+                doc.documentName === "Requested Subject" ||
+                doc.documentName === "Endorsement Form"
+              ) {
+                return true;
+              }
+            }
+
+            if (
+              doc.documentPath[doc.documentPath.length - 1].name ===
+                "Dean Office" &&
+              doc.documentPath[doc.documentPath.length - 1].approved &&
+              doc.documentPath[doc.documentPath.length - 1].confirmed
+            ) {
+              if ($userData.unit === "Academic VP") {
+                if (
+                  doc.documentName === "Faculty Loading" ||
+                  doc.documentName === "Requested Subject" ||
+                  doc.documentName === "Endorsement Form"
+                ) {
+                  return true;
+                }
+              }
+            }
+
+            if (
+              doc.documentPath[doc.documentPath.length - 1].name ===
+                "Academic VP" &&
+              doc.documentPath[doc.documentPath.length - 1].approved &&
+              !doc.documentPath[doc.documentPath.length - 1].confirmed
+            ) {
+              if (
+                doc.documentName === "Faculty Loading" ||
+                doc.documentName === "Requested Subject" ||
+                doc.documentName === "Endorsement Form"
+              ) {
+                return true;
+              }
+            }
+
+            if (
+              doc.documentPath[doc.documentPath.length - 1].name ===
+                "Academic VP" &&
+              doc.documentPath[doc.documentPath.length - 1].approved &&
+              doc.documentPath[doc.documentPath.length - 1].confirmed &&
+              doc.documentPath[doc.documentPath.length - 1].finished &&
+              !doc.documentPath[doc.documentPath.length - 1].complete
+            ) {
+              if (
+                doc.documentName === "Faculty Loading" ||
+                doc.documentName === "Requested Subject"
+              ) {
+                return true;
+              }
+            }
+
+            if (
+              doc.documentPath[doc.documentPath.length - 1].name === "HROS" &&
+              doc.documentPath[doc.documentPath.length - 1].confirmed
+            ) {
+              if ($userData.unit === "VPAA") {
+                if (doc.documentName === "Application for Leave") {
+                  return true;
+                }
+              }
+            }
+
+            if (
+              doc.documentPath[doc.documentPath.length - 1].name ===
+                "Academic VP" &&
+              doc.documentPath[doc.documentPath.length - 1].confirmed
+            ) {
+              if ($userData.unit === "OP") {
+                if (doc.documentName === "Endorsement Form") {
+                  return true;
+                }
+              }
+            }
+
+            if (user.unit === "Program Head") {
+              if (
+                doc.documentPath[doc.documentPath.length - 1].name ===
+                  "Dean Office" &&
+                doc.documentPath[doc.documentPath.length - 1].confirmed
+              ) {
+                if ($userData.unit === "HROS") {
+                  if (doc.documentName === "Application for leave") {
+                    return true;
+                  }
+                }
+              }
+
+              if (
+                doc.documentPath[doc.documentPath.length - 1].name === "HROS" &&
+                doc.documentPath[doc.documentPath.length - 1].confirmed
+              ) {
+                if ($userData.unit === "VPAA") {
+                  if (doc.documentName === "Application for leave") {
+                    return true;
+                  }
+                }
+              }
+            }
+
+            if (user.unit === "Dean Office") {
+              if (
+                doc.documentPath[doc.documentPath.length - 1].name === "HROS" &&
+                doc.documentPath[doc.documentPath.length - 1].confirmed
+              ) {
+                if ($userData.unit === "VPAA") {
+                  if (doc.documentName === "Application for leave") {
+                    return true;
+                  }
+                }
+              }
+            }
+          }
+
+          return false;
+        });
+
+        if (isValid) {
+          documents = [...documents, user];
+        }
+      });
+
+      $userData = response;
+    } catch (error) {
+      navigate("/auth/login");
+      console.error(error);
+    }
+  }
+
+  onMount(async () => {
+    await fetchDataAndDispatch();
+  });
+
+  let sortName = "Default";
+
+  const switchSortname = (name: string) => {
+    sortName = name;
+    $filterExpand = false;
+  };
+
+  const switchFiltername = (name: string) => {
+    // forwardedDocuments = orForwardedDocuments;
+    // approvedDocuments = orApprovedDocuments;
+    // rejectedDocuments = orRejectedDocuments;
+    // waitingDocuments = orWaitingDocuments;
+    // completeDocuments = orCompleteDocuments;
+
+    $filterName = name;
+    insName = "";
+    $sortExpand = false;
+  };
+
+  const insFiltername = (name: string) => {
+    // forwardedDocuments = orForwardedDocuments;
+    // approvedDocuments = orApprovedDocuments;
+    // rejectedDocuments = orRejectedDocuments;
+    // waitingDocuments = orWaitingDocuments;
+    // completeDocuments = orCompleteDocuments;
+    // if (insName === name) {
+    //   insName = "";
+    // } else {
+    //   forwardedDocuments = forwardedDocuments.filter(
+    //     (doc) => doc.institute === name
+    //   );
+    //   approvedDocuments = approvedDocuments.filter(
+    //     (doc) => doc.institute === name
+    //   );
+    //   rejectedDocuments = rejectedDocuments.filter(
+    //     (doc) => doc.institute === name
+    //   );
+    //   waitingDocuments = waitingDocuments.filter(
+    //     (doc) => doc.institute === name
+    //   );
+    //   completeDocuments = completeDocuments.filter(
+    //     (doc) => doc.institute === name
+    //   );
+    //   insName = name;
+    // }
+  };
 </script>
 
-<SecNav></SecNav>
+<!-- <SecNav></SecNav> -->
 {#if $detailsExpand}
   <DocumentModal {authToken} {route}></DocumentModal>
 {/if}
@@ -229,131 +555,146 @@
 <main>
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div class="filter">
-    {#if $filterName === "Self"}
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
+  {#if documents && documents.length}
+    <div class="filter">
+      {#if $filterName === "Self"}
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <div
+          class="filter-wrapper"
+          transition:fade
+          class:dark={$dark}
+          on:click|stopPropagation={() => {
+            $sortExpand = !$sortExpand;
+            $filterExpand = false;
+          }}
+          use:tooltip={{
+            content: "Sort",
+            animation: "perspective-subtle",
+            theme: "tooltip",
+            arrow: true,
+            offset: [0, 15],
+          }}
+        >
+          <span class="sort-name"> {sortName} </span>
+          <TriangleIcon
+            customDark={true}
+            rotate={$sortExpand}
+            on:click={() => {
+              $sortExpand = !$sortExpand;
+              $filterExpand = false;
+            }}
+          ></TriangleIcon>
+        </div>
+        <Dropdown expand={$sortExpand} self={true}>
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+          <li on:click={() => switchSortname("Default")}>
+            <span class="mode-name" class:active={sortName === "Default"}
+              >Default</span
+            >
+          </li>
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+          <li on:click={() => switchSortname("Date")}>
+            <span class="mode-name" class:active={sortName === "Date"}
+              >Date</span
+            >
+          </li>
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+          <li on:click={() => switchSortname("Name")}>
+            <span class="mode-name" class:active={sortName === "Name"}
+              >Name</span
+            >
+          </li>
+        </Dropdown>
+      {/if}
       <div
         class="filter-wrapper"
-        transition:fade
         class:dark={$dark}
         on:click|stopPropagation={() => {
-          $sortExpand = !$sortExpand;
-          $filterExpand = false;
+          $filterExpand = !$filterExpand;
+          $sortExpand = false;
         }}
         use:tooltip={{
-          content: "Sort",
+          content: "Filter",
           animation: "perspective-subtle",
           theme: "tooltip",
           arrow: true,
           offset: [0, 15],
         }}
       >
-        <span class="sort-name"> {sortName} </span>
+        <span class="sort-name">
+          {insName.length ? insName : $filterName}
+        </span>
         <TriangleIcon
           customDark={true}
-          rotate={$sortExpand}
+          rotate={$filterExpand}
           on:click={() => {
-            $sortExpand = !$sortExpand;
-            $filterExpand = false;
+            $filterExpand = !$filterExpand;
+            $sortExpand = false;
           }}
         ></TriangleIcon>
       </div>
-      <Dropdown expand={$sortExpand} self={true}>
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <Dropdown expand={$filterExpand} secretary={true}>
+        <h2 class="dropdown-title" class:dark={$dark}>Category</h2>
         <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-        <li on:click={() => switchSortname("Default")}>
-          <span class="mode-name" class:active={sortName === "Default"}
-            >Default</span
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <li on:click={() => switchFiltername("All")}>
+          <span class="mode-name" class:active={$filterName === "All"}>All</span
           >
         </li>
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-        <li on:click={() => switchSortname("Date")}>
-          <span class="mode-name" class:active={sortName === "Date"}>Date</span>
+        <li on:click={() => switchFiltername("Self")}>
+          <span class="mode-name" class:active={$filterName === "Self"}
+            >Self</span
+          >
+        </li>
+        <h2 class="dropdown-title" class:dark={$dark} style="margin-top: 1rem;">
+          Filter
+        </h2>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <li on:click={() => insFiltername("FGBM")}>
+          <span class="mode-name" class:active={insName === "FGBM"}>FGBM</span>
         </li>
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-        <li on:click={() => switchSortname("Name")}>
-          <span class="mode-name" class:active={sortName === "Name"}>Name</span>
+        <li on:click={() => insFiltername("FCDSET")}>
+          <span class="mode-name" class:active={insName === "FCDSET"}
+            >FCDSET</span
+          >
+        </li>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <li on:click={() => insFiltername("FNAHS")}>
+          <span class="mode-name" class:active={insName === "FNAHS"}>FNAHS</span
+          >
+        </li>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <li on:click={() => insFiltername("FALS")}>
+          <span class="mode-name" class:active={insName === "FALS"}>FALS</span>
+        </li>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <li on:click={() => insFiltername("FTED")}>
+          <span class="mode-name" class:active={insName === "FTED"}>FTED</span>
         </li>
       </Dropdown>
-    {/if}
-    <div
-      class="filter-wrapper"
-      class:dark={$dark}
-      on:click|stopPropagation={() => {
-        $filterExpand = !$filterExpand;
-        $sortExpand = false;
-      }}
-      use:tooltip={{
-        content: "Filter",
-        animation: "perspective-subtle",
-        theme: "tooltip",
-        arrow: true,
-        offset: [0, 15],
-      }}
-    >
-      <span class="sort-name"> {insName.length ? insName : $filterName} </span>
-      <TriangleIcon
-        customDark={true}
-        rotate={$filterExpand}
-        on:click={() => {
-          $filterExpand = !$filterExpand;
-          $sortExpand = false;
-        }}
-      ></TriangleIcon>
     </div>
-    <Dropdown expand={$filterExpand} secretary={true}>
-      <h2 class="dropdown-title" class:dark={$dark}>Category</h2>
-      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <li on:click={() => switchFiltername("All")}>
-        <span class="mode-name" class:active={$filterName === "All"}>All</span>
-      </li>
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-      <li on:click={() => switchFiltername("Self")}>
-        <span class="mode-name" class:active={$filterName === "Self"}>Self</span
-        >
-      </li>
-      <h2 class="dropdown-title" class:dark={$dark} style="margin-top: 1rem;">
-        Filter
-      </h2>
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-      <li on:click={() => insFiltername("FGBM")}>
-        <span class="mode-name" class:active={insName === "FGBM"}>FGBM</span>
-      </li>
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-      <li on:click={() => insFiltername("FCDSET")}>
-        <span class="mode-name" class:active={insName === "FCDSET"}>FCDSET</span
-        >
-      </li>
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-      <li on:click={() => insFiltername("FNAHS")}>
-        <span class="mode-name" class:active={insName === "FNAHS"}>FNAHS</span>
-      </li>
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-      <li on:click={() => insFiltername("FALS")}>
-        <span class="mode-name" class:active={insName === "FALS"}>FALS</span>
-      </li>
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-      <li on:click={() => insFiltername("FTED")}>
-        <span class="mode-name" class:active={insName === "FTED"}>FTED</span>
-      </li>
-    </Dropdown>
-  </div>
 
-  {#if $activeTab === "Forward"}
+    <UserCard filteredArray={documents} {route}></UserCard>
+  {:else}
+    <h1>You don't have any transactions yet!</h1>
+  {/if}
+
+  <!-- {#if $activeTab === "Forward"}
     {#if !forwardedDocuments.length}
       There's no Forwarded Documents yet!
     {:else}
-      <UserCard filteredArray={forwardedDocuments} {route}></UserCard>
     {/if}
   {:else if $activeTab === "Approved"}
     {#if !approvedDocuments.length}
@@ -379,7 +720,7 @@
     {:else}
       <UserCard filteredArray={completeDocuments} {route}></UserCard>
     {/if}
-  {/if}
+  {/if} -->
 </main>
 
 <style>

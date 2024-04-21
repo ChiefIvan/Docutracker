@@ -9,7 +9,7 @@
     registrationExpand,
   } from "../../store";
   import { createEventDispatcher } from "svelte";
-  import { afterUpdate, onDestroy } from "svelte";
+  import { onMount, onDestroy } from "svelte";
 
   import moment from "moment";
   import Card from "../shared/Card.svelte";
@@ -19,7 +19,6 @@
   import TriangleIcon from "../icons/TriangleIcon.svelte";
   import Status from "./Status.svelte";
   import DocumentModal from "./DocumentModal.svelte";
-  import Button from "../shared/Button.svelte";
 
   export let authToken = "";
 
@@ -27,7 +26,14 @@
 
   let docN = "";
   let docid = "";
-  afterUpdate(() => {
+  let appDate = "";
+  let comDate = "";
+
+  $: selectedDocument = $documents.find((document) => {
+    return document.codeData === docid;
+  });
+
+  onMount(() => {
     docid = localStorage.getItem("docid") || "";
 
     let documentExistance = $documents.filter(
@@ -38,33 +44,25 @@
       docN = localStorage.getItem("docN") || "";
       docid = localStorage.getItem("docid") || "";
     }
-  });
 
-  let appDate: string = "";
-  let comDate: string = "";
-
-  $: selectedDocument = $documents.find((document) => {
-    return document.codeData === docid;
+    console.log(documentExistance);
   });
 
   let days = 0;
   let hours = 0;
   let minutes = 0;
   let seconds = 0;
-  let interval: NodeJS.Timeout;
 
   $: if (
     selectedDocument &&
     selectedDocument.documentPath &&
     selectedDocument.documentPath.length
   ) {
-    appDate = selectedDocument.documentPath[0].approvedDate || "";
     comDate =
       selectedDocument.documentPath[selectedDocument.documentPath.length - 1]
         .completeDate || "";
-  } else {
-    appDate = "";
-    comDate = "";
+    console.log(comDate);
+    appDate = selectedDocument.documentPath[0].approvedDate || "";
   }
 
   $: if (appDate.length && comDate.length) {
@@ -76,25 +74,22 @@
     hours = duration.hours();
     minutes = duration.minutes();
     seconds = duration.seconds();
-  } else if (appDate.length && !comDate.length) {
-    interval = setInterval(() => {
-      let currentTime = moment();
-      let eventTime = moment(appDate, "ddd, DD MMM YYYY HH:mm:ss z");
+  } else {
+    setInterval(() => {
+      if (!comDate.length) {
+        let currentTime = moment();
+        let eventTime = moment(appDate, "ddd, DD MMM YYYY HH:mm:ss z");
 
-      if (currentTime.isAfter(eventTime)) {
-        let duration = moment.duration(currentTime.diff(eventTime));
+        if (currentTime.isAfter(eventTime)) {
+          let duration = moment.duration(currentTime.diff(eventTime));
 
-        days = duration.days();
-        hours = duration.hours();
-        minutes = duration.minutes();
-        seconds = duration.seconds();
+          days = duration.days();
+          hours = duration.hours();
+          minutes = duration.minutes();
+          seconds = duration.seconds();
+        }
       }
     }, 1000);
-  } else {
-    days = 0;
-    hours = 0;
-    minutes = 0;
-    seconds = 0;
   }
 
   const registerDocument = () => {
@@ -185,7 +180,12 @@
             <span class:dark={$dark}>Register or Add Documents</span>
           </div>
         </Card>
-        <Card>
+        <Card
+          on:click={() => {
+            $documentSelected = "";
+            dispatch("switch", "Scan Document");
+          }}
+        >
           <div class="svg-wrapper" class:dark={$dark}>
             <RequestIcon></RequestIcon>
           </div>
@@ -236,8 +236,8 @@
             {#if value.codeData === docid}
               <!-- {@const lastPath =
               value.documentPath[value.documentPath.length - 1]} -->
-              {#each value.documentPath as pathValue, i (i)}
-                {#if pathValue.approved && !pathValue.confirmed && pathValue.finished && pathValue.complete}
+              {#each value.documentPath.reverse() as pathValue, i (i)}
+                {#if pathValue.approved && pathValue.confirmed && pathValue.finished && pathValue.complete}
                   <div class="info-wrapper">
                     <div class="date-wrapper">
                       <p class:dark={$dark}>{pathValue.completeDate}</p>
@@ -297,8 +297,8 @@
                       <span class:dark={$dark}
                         >This Document is waiting to be passed on to the next
                         step in the process and ready to be approve by the
-                        reciever of the next route. Please proceed to that
-                        route as soon as possible.</span
+                        reciever of the next route. Please proceed to that route
+                        as soon as possible.</span
                       >
                     </div>
                   </div>
@@ -353,7 +353,9 @@
                       <p class:dark={$dark}>{pathValue.disapprovedDate}</p>
                     </div>
                     <div class="info">
-                      <h3 class:dark={$dark}>Status: Unsuccessful {pathValue.name}</h3>
+                      <h3 class:dark={$dark}>
+                        Status: Unsuccessful {pathValue.name}
+                      </h3>
                       <span class:dark={$dark}
                         >Your document has arrived at the {pathValue.name} but unfortunately,
                         the {pathValue.name} disapproved your document, this signifies
@@ -369,8 +371,9 @@
                     <p class:dark={$dark}>{value.pendingDate}</p>
                   </div>
                   <div class="info">
-                    <h3 class:dark={$dark}>Status: To be Forwarded
-                    <!-- {#if value.documentName === "Faculty Loading"}
+                    <h3 class:dark={$dark}>
+                      Status: To be Forwarded
+                      <!-- {#if value.documentName === "Faculty Loading"}
                       Program Head
                     {/if} -->
                     </h3>

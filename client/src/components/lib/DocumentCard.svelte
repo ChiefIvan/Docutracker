@@ -1,9 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
-  import { handleDetails, type Users } from "../../store";
-
-  import DocumentModal from "./DocumentModal.svelte";
+  import { handleDetails, userData, type Users } from "../../store";
 
   export let user: Users;
 
@@ -19,33 +17,52 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div transition:fade class="overlay" on:click|self={handleClose}>
   <div class="document-wrapper">
-    <h1>Documents</h1>
+    <h1>{user.fullName}</h1>
     <hr />
     {#if user && user.documents}
       <ul>
-        {#each user.documents as document, i (document.documentID)}
-          {@const lastRoute =
-            document.documentPath && document.documentPath.length
-              ? document.documentPath[document.documentPath.length - 1]
-              : 0}
+        {#each user.documents as document (document.documentID)}
           <!-- svelte-ignore missing-declaration -->
           <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-          <li
-            on:click={() =>
-              handleDetails(user.fullName, user.email, document, "tab1")}
-          >
-            <div class="document-name">
-              {i+1}. {document.documentName}
-            </div>
-            <div class="wrapper">
-              <div>
-                {document.codeData}
+          {#if document.documentPath.length && document.documentPath[document.documentPath.length - 1].name == $userData.unit && document.documentPath[document.documentPath.length - 1].approved && !document.documentPath[document.documentPath.length - 1].confirmed && !document.documentPath[document.documentPath.length - 1].complete}
+            <li
+              on:click={() =>
+                handleDetails(user.fullName, user.email, document, "tab1")}
+            >
+              <div class="document-name">
+                {document.documentName}
               </div>
-              <div>
-                {document.pendingDate}
+              <div class="wrapper">
+                <div>
+                  {document.codeData}
+                </div>
+                <div>
+                  {document.pendingDate}
+                </div>
               </div>
-            </div>
-          </li>
+            </li>
+          {/if}
+
+          <!-- svelte-ignore missing-declaration -->
+          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+          {#if (!document.documentPath.length && $userData.unit === "Program Head") || (!document.documentPath.length && $userData.unit === "Dean Office" && document.documentName === "Application For Leave") || (!document.documentPath.length && $userData.unit === "HROS" && document.documentName === "Application For Leave")}
+            <li
+              on:click={() =>
+                handleDetails(user.fullName, user.email, document, "tab1")}
+            >
+              <div class="document-name">
+                {document.documentName}
+              </div>
+              <div class="wrapper">
+                <div>
+                  {document.codeData}
+                </div>
+                <div>
+                  {document.pendingDate}
+                </div>
+              </div>
+            </li>
+          {/if}
         {/each}
       </ul>
     {/if}
@@ -66,9 +83,9 @@
       background-color: var(--background);
       max-width: 800px;
       width: 100%;
-      height: 60%;
+      max-height: 60%;
+      height: 100%;
       border-radius: 1rem;
-      overflow-y: auto;
 
       & h1 {
         font-size: 1.5rem;
@@ -79,6 +96,8 @@
       & ul {
         padding: 0.5rem;
         max-width: 100%;
+        height: calc(100% - 60px);
+        overflow-y: auto;
 
         & li {
           padding: 0.5rem;

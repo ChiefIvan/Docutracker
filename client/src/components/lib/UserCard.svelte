@@ -15,7 +15,6 @@
 
   export let filteredArray: Users[] = [];
 
-  $: console.log(filteredArray);
   export let route: string = "";
 
   let documentsExpand = false;
@@ -23,26 +22,27 @@
 
   const handleUserDocuments = (selecctedUser: Users) => {
     documentsExpand = true;
-    user = selecctedUser
+    user = selecctedUser;
   };
 </script>
 
 {#if documentsExpand}
-  <DocumentCard {user} on:close={() => documentsExpand = false}></DocumentCard>
+  <DocumentCard {user} on:close={() => (documentsExpand = false)}
+  ></DocumentCard>
 {/if}
 
 {#if $filterName === "All"}
   <div class="table">
-    {#each filteredArray as user (user.id)}
-      <div class="table-head" class:dark={$dark}>
-        <div class:dark={$dark}>Author</div>
-        <div class:dark={$dark}>Email</div>
-        <div class:dark={$dark}>Institue</div>
-        <div class:dark={$dark}>Unit/Designation</div>
-      </div>
-      <!-- svelte-ignore missing-declaration -->
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div class="table-head" class:dark={$dark}>
+      <div class="img" class:dark={$dark}>Author</div>
+      <div class:dark={$dark}>Email</div>
+      <div class:dark={$dark}>Institue</div>
+      <div class:dark={$dark}>Unit/Designation</div>
+    </div>
+    <!-- svelte-ignore missing-declaration -->
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    {#each filteredArray as user, i (i)}
       <div class="table-body" on:click={() => handleUserDocuments(user)}>
         <p class="value img">
           <!-- svelte-ignore a11y-img-redundant-alt -->
@@ -53,7 +53,7 @@
         <p class="value">{user.institute}</p>
         <p class="value">{user.designation}</p>
       </div>
-     <!-- LeftOver Goes Here -->
+      <!-- LeftOver Goes Here -->
     {/each}
   </div>
 {:else}
@@ -91,16 +91,27 @@
     & div.table-body {
       display: flex;
       transition: all ease-in-out 300ms;
-      border-radius: .5rem;
+      border-radius: 0.5rem;
       margin-bottom: 0.5rem;
       cursor: pointer;
-      padding: 0.5rem;
+      padding: 0.3rem;
 
       & p.value {
         transition: all ease-in-out 500ms;
         flex: 1;
         padding: 0 0.5rem;
         color: var(--main-col-3);
+        display: flex;
+        align-items: center;
+      }
+
+      & p.value.img {
+        column-gap: 0.5rem;
+
+        & img {
+          max-width: 3rem;
+          border-radius: 50%;
+        }
       }
     }
 
@@ -109,7 +120,7 @@
     }
 
     & div.table-body:nth-child(odd) {
-      background-color: var(--main-col-5);;
+      background-color: var(--main-col-5);
     }
 
     & div.user-wrapper {

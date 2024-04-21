@@ -1,12 +1,10 @@
 <script lang="ts">
   import {
     dark,
-    sortExpand,
-    searchArray,
-    sortArray,
     activeTab,
     handleDetails,
     type Users,
+    userData,
   } from "../../store";
   import { tooltip } from "../shared/Tooltip";
   import { afterUpdate } from "svelte";
@@ -17,18 +15,22 @@
   export let route: string = "";
 
   let approvedDocuments: Users[] = [];
-  let rejectedDocuments: Users[] = [];
-  let waitingDocuments: Users[] = [];
+  // let rejectedDocuments: Users[] = [];
+  // let waitingDocuments: Users[] = [];
 
   filteredArray.map((user) => {
     const approvedDocs = user.documents.filter((document) => {
       return (
-        document.documentPath.length &&
-        document.documentPath[document.documentPath.length - 1].name ===
-          route &&
-        document.documentPath[document.documentPath.length - 1].approved &&
-        !document.documentPath[document.documentPath.length - 1].confirmed &&
-        !document.documentPath[document.documentPath.length - 1].finished
+        (document.documentPath.length &&
+          document.documentPath[document.documentPath.length - 1].name ===
+            $userData.unit &&
+          document.documentPath[document.documentPath.length - 1].approved &&
+          !document.documentPath[document.documentPath.length - 1].confirmed) ||
+        (document.documentPath.length &&
+          document.documentPath[document.documentPath.length - 1].name ===
+            $userData.unit &&
+          document.documentPath[document.documentPath.length - 1].confirmed &&
+          document.documentPath[document.documentPath.length - 1].finished)
       );
     });
 
@@ -40,46 +42,44 @@
     }
   });
 
-  filteredArray.map((user) => {
-    const rejectedDocs = user.documents.filter((document) => {
-      return (
-        document.documentPath.length &&
-        document.documentPath[document.documentPath.length - 1].name ===
-          route &&
-        !document.documentPath[document.documentPath.length - 1].approved
-      );
-    });
+  // filteredArray.map((user) => {
+  //   const rejectedDocs = user.documents.filter((document) => {
+  //     return (
+  //       document.documentPath.length &&
+  //       document.documentPath[document.documentPath.length - 1].name ===
+  //         route &&
+  //       !document.documentPath[document.documentPath.length - 1].approved
+  //     );
+  //   });
 
-    if (rejectedDocs.length > 0) {
-      rejectedDocuments = [
-        ...rejectedDocuments,
-        { ...user, documents: rejectedDocs },
-      ];
-    }
-  });
+  //   if (rejectedDocs.length > 0) {
+  //     rejectedDocuments = [
+  //       ...rejectedDocuments,
+  //       { ...user, documents: rejectedDocs },
+  //     ];
+  //   }
+  // });
 
-  filteredArray.map((user) => {
-    const waitingDocs = user.documents.filter((document) => {
-      return (
-        document.documentPath.length &&
-        document.documentPath[document.documentPath.length - 1].name ===
-          route &&
-        document.documentPath[document.documentPath.length - 1].approved &&
-        document.documentPath[document.documentPath.length - 1].finished
-      );
-    });
+  // filteredArray.map((user) => {
+  //   const waitingDocs = user.documents.filter((document) => {
+  //     return (
+  //       document.documentPath.length &&
+  //       document.documentPath[document.documentPath.length - 1].name ===
+  //         route &&
+  //       document.documentPath[document.documentPath.length - 1].approved &&
+  //       document.documentPath[document.documentPath.length - 1].finished
+  //     );
+  //   });
 
-    if (waitingDocs.length > 0) {
-      waitingDocuments = [
-        ...waitingDocuments,
-        { ...user, documents: waitingDocs },
-      ];
-    }
-  });
+  //   if (waitingDocs.length > 0) {
+  //     waitingDocuments = [
+  //       ...waitingDocuments,
+  //       { ...user, documents: waitingDocs },
+  //     ];
+  //   }
+  // });
 
-  console.log(approvedDocuments);
-  console.log(rejectedDocuments);
-  console.log(waitingDocuments);
+  $: console.log(approvedDocuments);
 
   // $: console.log(rejectedDocuments);
 
@@ -99,18 +99,18 @@
 
   let statusNavigation = "Forwarded";
 
-  $: if ($activeTab === "Approved") {
-    filteredArray = approvedDocuments;
-  } else if ($activeTab === "Rejected") {
-    filteredArray = rejectedDocuments;
-  } else if ($activeTab === "Waiting") {
-    filteredArray = waitingDocuments;
-  }
+  // $: if ($activeTab === "Approved") {
+  //   filteredArray = approvedDocuments;
+  // } else if ($activeTab === "Rejected") {
+  //   filteredArray = rejectedDocuments;
+  // } else if ($activeTab === "Waiting") {
+  //   filteredArray = waitingDocuments;
+  // }
 </script>
 
 <!-- <div> -->
 <section class="content-wrapper">
-  {#if filteredArray.length}
+  {#if approvedDocuments.length}
     <div class="table-wrapper">
       <div class="table" class:dark={$dark}>
         <div class="table-head" class:dark={$dark}>
@@ -145,7 +145,7 @@
                 <div class="date" class:dark={$dark}>Sample</div>
               </div>
             {/each} -->
-          {#each filteredArray as filteredUser, i (i)}
+          {#each approvedDocuments as filteredUser, i (i)}
             {#each filteredUser.documents as document (document.documentID)}
               <!-- svelte-ignore a11y-click-events-have-key-events -->
               <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -209,7 +209,7 @@
     </div>
   {:else}
     <h2 class="no-document" class:dark={$dark}>
-      You don't have any {statusNavigation} Documents
+      You don't have any Accepted Documents
     </h2>
   {/if}
 </section>

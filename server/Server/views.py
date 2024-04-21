@@ -159,7 +159,8 @@ def document_approval() -> dict:
         if not document:
             return jsonify({"error": "There's no document assciated with this document!"})
 
-        route: Route = Route.query.filter_by(document_id=document.id).first()
+        route: Route = Route.query.filter_by(
+            document_id=document.id, name=data["unit"]).first()
         notification: Notification = Notification.query.filter_by(
             document_id=document.id).first()
 
@@ -183,7 +184,7 @@ def document_approval() -> dict:
             db.session.add(new_route)
 
             new_notification: Notification = Notification(
-                title="Approved",
+                title=f"Approved!... By {data['unit']}",
                 body=f"Your {document.name} has been Approved!",
                 date=datetime.now(),
                 document_id=document.id,
@@ -245,6 +246,7 @@ def document_approval() -> dict:
             if not route:
                 return jsonify({"error", "There's no document, please register one first!"})
 
+            route.confirmed = True
             route.confirmed_date = datetime.now()
             route.finished = True
             route.finished_date = datetime.now()
@@ -275,16 +277,15 @@ def document_approval() -> dict:
 
             db.session.add(new_notification)
             db.session.commit()
-            
+
         else:
             if not route:
                 return jsonify({"error", "There's no document, please register one first!"})
-            
+
             db.session.delete(route)
             document.attemp += 1
-            
+
             db.session.commit()
-            
 
     return jsonify({"success": "Success!"})
 

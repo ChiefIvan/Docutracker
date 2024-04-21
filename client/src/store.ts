@@ -233,6 +233,8 @@ const handleGET = async (address: string, token: null | string) => {
 export const address = "http://127.0.0.1:5000";
 export const location = writable("/");
 export const documentSelected = writable("");
+export const appDate = writable("");
+export const comDate = writable("");
 export const activeTab = writable("Forward");
 export const filterName = writable("All");
 

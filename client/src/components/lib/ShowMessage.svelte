@@ -42,7 +42,7 @@
   div.response-message {
     position: fixed;
     top: 2.5rem;
-    z-index: 2;
+    z-index: 20;
     padding: 0.4rem 0;
     width: 100%;
     text-align: center;

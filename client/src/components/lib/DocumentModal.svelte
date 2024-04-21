@@ -84,7 +84,6 @@
       $documentDetails.documentD.documentPath.length - 1
     ];
 
-  $: console.log(lastRoute);
 </script>
 
 {#if openComment}
@@ -167,7 +166,8 @@
         <div class="content">
           <p>Document ID</p>
           <p class="value">{$documentDetails.documentD.codeData}</p>
-        </div><div class="content">
+        </div>
+        <div class="content">
           <p>Submit Attemps</p>
           <p class="value">{$documentDetails.documentD.attemps}</p>
         </div>
@@ -177,18 +177,10 @@
         </div>
         {#if $documentDetails.documentD.documentPath && $documentDetails.documentD.documentPath.length}
           {#each $documentDetails.documentD.documentPath as path, i (i)}
-            {#if path.approved && !path.finished}
+            {#if (path.approved && path.confirmed) || path.finished}
               <div class="content">
                 <p>
-                  {$documentDetails.documentD.documentPath
-                    .length}{$documentDetails.documentD.documentPath.length ===
-                  1
-                    ? "st"
-                    : $documentDetails.documentD.documentPath.length === 2
-                      ? "nd "
-                      : $documentDetails.documentD.documentPath.length === 3
-                        ? "rd"
-                        : "th"} Route (Approved By)
+                  {i + 1} Route (Approved By)
                 </p>
                 <p class="value">{path.name}</p>
               </div>
@@ -227,7 +219,7 @@
                 {:else}
                   Program Head / HROS / VPAA
                 {/if}
-              {:else if $userData.previlage === "Secretary"}
+              {:else if $userData.previlage === "Secretary"}  
                 {#if $userData.users && $userData.users.length}
                   {#each $userData.users as user, i (i)}
                     {#if $documentDetails.emailD === user.email}
@@ -277,12 +269,16 @@
       {#if $documentDetails.documentD.documentPath.length}
         {#if lastRoute.approved && !lastRoute.confirmed && !lastRoute.finished}
           {#if $filterName == "Self"}
-            <Button hoverized={true} on:click={() => handleApproval("finish")}
-              >Finish (Applicable for the last route)</Button
-            >
-            <Button hoverized={true} on:click={() => handleApproval("confirm")}
-              >Confirm</Button
-            >
+            {#if lastRoute.name === "Academic VP" || lastRoute.name === "Academic VP" || lastRoute.name === "VPAA" || lastRoute.name === "OP"}
+              <Button hoverized={true} on:click={() => handleApproval("finish")}
+                >Finish (Applicable for the last route)</Button
+              >
+            {:else}
+              <Button
+                hoverized={true}
+                on:click={() => handleApproval("confirm")}>Confirm</Button
+              >
+            {/if}
           {/if}
         {:else if lastRoute.approved && lastRoute.finished && !lastRoute.complete}
           {#if $filterName === "Self"}
@@ -313,7 +309,9 @@
     {/if}
     {#if $userData.previlage === "User"}
       {#if lastRoute && !lastRoute.approved}
-        <Button hoverized={true} on:click={() => handleApproval("resubmit")}>Re-Submit</Button>
+        <Button hoverized={true} on:click={() => handleApproval("resubmit")}
+          >Re-Submit</Button
+        >
       {/if}
     {/if}
     <!-- {#if $location === "/history"}

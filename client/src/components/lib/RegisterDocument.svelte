@@ -224,8 +224,8 @@
                 Program Head -> Dean Office -> Academic VP -> OP
               {:else if documentSelected === "Application for Leave"}
                 {#if $userData.unit === "Program Head"}
-                  Dean / HROS / VPAA
-                {:else if $userData.unit === "Dean"}
+                  Dean Office / HROS / VPAA
+                {:else if $userData.unit === "Dean Office"}
                   HROS / VPAA
                 {:else}
                   Program Head / HROS / VPAA

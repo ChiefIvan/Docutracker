@@ -122,9 +122,9 @@
       <DomEvents />
       <Header on:switch={handleShortcutData} />
 
-      {#if $registrationExpand}
+      <!-- {#if $registrationExpand}
         <UserRegistration />
-      {/if}
+      {/if} -->
 
       <Route path="" component={_Error} />
       <Route path="/" component={Overview} />
