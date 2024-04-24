@@ -24,7 +24,7 @@
         {#each user.documents as document (document.documentID)}
           <!-- svelte-ignore missing-declaration -->
           <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-          {#if document.documentPath.length && document.documentPath[document.documentPath.length - 1].name == $userData.unit && document.documentPath[document.documentPath.length - 1].approved && !document.documentPath[document.documentPath.length - 1].confirmed && !document.documentPath[document.documentPath.length - 1].complete}
+          {#if (document.documentPath.length && document.documentPath[document.documentPath.length - 1].name == $userData.unit && document.documentPath.length && document.documentPath[document.documentPath.length - 1].approved && !document.documentPath[document.documentPath.length - 1].confirmed) || (document.documentPath.length && document.documentPath[document.documentPath.length - 1].approved && document.documentPath[document.documentPath.length - 1].confirmed && !document.documentPath[document.documentPath.length - 1].complete)}
             <li
               on:click={() =>
                 handleDetails(user.fullName, user.email, document, "tab1")}

@@ -30,7 +30,8 @@
           document.documentPath[document.documentPath.length - 1].name ===
             $userData.unit &&
           document.documentPath[document.documentPath.length - 1].confirmed &&
-          document.documentPath[document.documentPath.length - 1].finished)
+          document.documentPath[document.documentPath.length - 1].finished &&
+          !document.documentPath[document.documentPath.length - 1].complete)
       );
     });
 

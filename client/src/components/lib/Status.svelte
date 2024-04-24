@@ -35,6 +35,8 @@
         !document.documentPath[document.documentPath.length - 1].complete)
   );
 
+  $: console.log(forwardArrayOr);
+
   $: approvedArrayOr = $documents.filter(
     (document) =>
       document.documentPath.length &&

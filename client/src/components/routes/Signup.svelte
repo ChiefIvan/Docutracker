@@ -254,10 +254,6 @@
       newUser.employeeID = target.value;
     }
 
-    if (id === "Designation") {
-      newUser.unit = target.value;
-    }
-
     if (id === "Password") {
       newUser.password = target.value;
     }
@@ -401,6 +397,8 @@
     const target = event.target as HTMLInputElement;
     newUser.institute = target.value;
   };
+
+  $: console.log(newUser.unit);
 </script>
 
 <svelte:head>
@@ -484,17 +482,18 @@
       dark={$dark}
       overlap={true}
     />
-    <Input
-      inputType="text"
-      inputName="Fullname"
-      verifiedEntry={fullNameVerified}
-      tooltipContent="Your Fullname must be greater than 8 characters!"
-      on:input={handleInput}
-      bind:focusedInput={inputBinds.fullNameInput}
-      dark={$dark}
-      overlap={true}
-    />
+
     <div class="input-center-wrapper">
+      <Input
+        inputType="text"
+        inputName="Fullname"
+        verifiedEntry={fullNameVerified}
+        tooltipContent="Your Fullname must be greater than 8 characters!"
+        on:input={handleInput}
+        bind:focusedInput={inputBinds.fullNameInput}
+        dark={$dark}
+        overlap={true}
+      />
       <Input
         inputType="text"
         inputName="Employee ID"
@@ -502,16 +501,6 @@
         tooltipContent="Your employee ID must follow this pattern: '123456-789' six digits on the left side and 3 digits on right side separated by '-' symbol!"
         on:input={handleInput}
         bind:focusedInput={inputBinds.employeeIDInput}
-        dark={$dark}
-        overlap={true}
-      />
-      <Input
-        inputType="text"
-        inputName="Designation"
-        verifiedEntry={unitVerified}
-        tooltipContent="Office/Designation must be greater than 4 characters!"
-        on:input={handleInput}
-        bind:focusedInput={inputBinds.unitInput}
         dark={$dark}
         overlap={true}
       />
@@ -539,45 +528,79 @@
       />
     </div>
 
-    <div class="select-wrapper">
-      <label for="institute-select" class="select-title" class:dark={$dark}
-        >Institute</label
-      >
-      <select
-        class="institutes"
-        on:change={(e) => {
-          othersRev = event?.target.value === "others" ? true : false;
-          if (othersRev) {
-            newUser.institute = "";
-          }
+    <!-- <Input
+        inputType="text"
+        inputName="Designation"
+        verifiedEntry={unitVerified}
+        tooltipContent="Office/Designation must be greater than 4 characters!"
+        on:input={handleInput}
+        bind:focusedInput={inputBinds.unitInput}
+        dark={$dark}
+        overlap={true}
+      /> -->
 
-          newUser.institute = event?.target.value;
-        }}
-        name="institutes"
-        id="institute-select"
-      >
-        <option value="">Select an Option</option>
-        <option value="fcdset">FCDSET</option>
-        <option value="fnahs">FNAHS</option>
-        <option value="false">FALS</option>
-        <option value="fted">FTED</option>
-        <option value="fcdset">FCDSET</option>
-        <option value="fgbm">FGBM</option>
-        <option value="others">Others: Please Specify</option>
-      </select>
-      {#if othersRev}
-        <div class="others-wrapper">
-          <Input
-            inputType="text"
-            inputName="Please Specify (N/A if not Applicable)"
-            verifiedEntry={instituteVerified}
-            on:input={handleInput}
-            bind:focusedInput={inputBinds.otherInput}
-            dark={$dark}
-            overlap={true}
-          />
-        </div>
-      {/if}
+    <div class="main-select-wrapper">
+      <div class="select-wrapper">
+        <label for="institute-select" class="select-title" class:dark={$dark}
+          >Designation</label
+        >
+        <select
+          class="institutes"
+          on:change={(event) => {
+            newUser.unit = event?.target.value;
+          }}
+          name="institutes"
+          id="institute-select"
+        >
+          <option value="">Select an Option</option>
+          <option value="Program Head">Program Head</option>
+          <option value="Dean Office">Dean Office</option>
+          <option value="Academic VP">Academic VP</option>
+          <option value="HROS">HROS</option>
+          <option value="VPAA">VPAA</option>
+        </select>
+      </div>
+
+      <div class="select-wrapper">
+        <label for="institute-select" class="select-title" class:dark={$dark}
+          >Institute</label
+        >
+        <select
+          class="institutes"
+          on:change={(event) => {
+            othersRev = event?.target.value === "others" ? true : false;
+            if (othersRev) {
+              newUser.institute = "";
+            }
+
+            newUser.institute = event?.target.value;
+          }}
+          name="institutes"
+          id="institute-select"
+        >
+          <option value="">Select an Option</option>
+          <option value="fcdset">FCDSET</option>
+          <option value="fnahs">FNAHS</option>
+          <option value="false">FALS</option>
+          <option value="fted">FTED</option>
+          <option value="fcdset">FCDSET</option>
+          <option value="fgbm">FGBM</option>
+          <option value="others">Others: Please Specify</option>
+        </select>
+        {#if othersRev}
+          <div class="others-wrapper">
+            <Input
+              inputType="text"
+              inputName="N/A if not Applicable"
+              verifiedEntry={instituteVerified}
+              on:input={handleInput}
+              bind:focusedInput={inputBinds.otherInput}
+              dark={$dark}
+              overlap={true}
+            />
+          </div>
+        {/if}
+      </div>
     </div>
 
     <div class="section-container">
@@ -673,57 +696,64 @@
         column-gap: 1rem;
       }
 
-      & div.select-wrapper {
-        margin-top: 1rem;
+      & div.main-select-wrapper {
         display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        row-gap: 1rem;
-        border: 1px solid var(--main-col-2);
-        border-radius: 1rem;
-        position: relative;
-        padding: 1.5rem 0.5rem 0.5rem 0.5rem;
+        align-items: start;
+        column-gap: 1rem;
 
-        & label.select-title {
-          position: absolute;
-          top: -1.5rem;
-          left: 1rem;
-          font-size: 1.2rem;
-          font-weight: bold;
-          padding: 0.5rem;
-          background-color: var(--background);
-          color: var(--scroll-color);
-          transition: all 300ms;
-          cursor: pointer;
-        }
-
-        & label.dark {
-          background-color: var(--dark-main-col-3);
-          color: var(--main-col-7);
-        }
-
-        & select.institutes {
-          width: 100%;
-          background-color: var(--background);
-          border-radius: 0.5rem;
-          padding: 0.5rem;
+        & div.select-wrapper {
+          width: 50%;
+          margin-top: 1rem;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+          row-gap: 1rem;
           border: 1px solid var(--main-col-2);
-          font-size: 1.1rem;
-          color: var(--scroll-color);
-          cursor: pointer;
+          border-radius: 1rem;
+          position: relative;
+          padding: 1.5rem 0.5rem 0.5rem 0.5rem;
 
-          & option {
+          & label.select-title {
+            position: absolute;
+            top: -1.5rem;
+            left: 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 0.5rem;
+            background-color: var(--background);
+            color: var(--scroll-color);
+            transition: all 300ms;
+            cursor: pointer;
+          }
+
+          & label.dark {
+            background-color: var(--dark-main-col-3);
+            color: var(--main-col-7);
+          }
+
+          & select.institutes {
+            width: 100%;
+            background-color: var(--background);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            border: 1px solid var(--main-col-2);
+            font-size: 1.1rem;
+            color: var(--scroll-color);
+            cursor: pointer;
+
+            & option {
+              font-size: 1rem;
+            }
+          }
+
+          & div.others-wrapper {
+            width: 100%;
+          }
+
+          & div.others-wrapper > * {
             font-size: 1rem;
           }
-        }
-
-        & div.others-wrapper {
-          width: 100%;
-        }
-
-        & div.others-wrapper > * {
-          font-size: 1rem;
         }
       }
 
