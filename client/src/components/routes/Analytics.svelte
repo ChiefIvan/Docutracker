@@ -200,17 +200,17 @@
             {/if}
           </p>
         </div>
-        <div>
+        <!-- <div>
           <h2>Summary</h2>
-          <p>
+          <p> -->
             <!-- This section keeps track of the time taken by each route for the
           specific document you’ve chosen. -->
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Dolor officiis
+            <!-- Lorem ipsum dolor sit, amet consectetur adipisicing elit. Dolor officiis
             quisquam omnis? Assumenda ab reprehenderit labore distinctio similique
             modi odit numquam laborum nobis velit doloribus voluptatum dolores, mollitia,
             rerum voluptate at suscipit quaerat nostrum. Minima!
           </p>
-        </div>
+        </div> -->
       </div>
     </div>
   {:else}

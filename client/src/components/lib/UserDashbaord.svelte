@@ -9,7 +9,7 @@
     registrationExpand,
   } from "../../store";
   import { createEventDispatcher } from "svelte";
-  import { onMount, onDestroy } from "svelte";
+  import { afterUpdate, onDestroy } from "svelte";
 
   import moment from "moment";
   import Card from "../shared/Card.svelte";
@@ -33,7 +33,7 @@
     return document.codeData === docid;
   });
 
-  onMount(() => {
+  afterUpdate(() => {
     docid = localStorage.getItem("docid") || "";
 
     let documentExistance = $documents.filter(
@@ -190,8 +190,8 @@
             <RequestIcon></RequestIcon>
           </div>
           <div class="label-wrapper">
-            <p class:dark={$dark}>Request a Document</p>
-            <span class:dark={$dark}>Request a Document from Admin</span>
+            <p class:dark={$dark}>Scan Document</p>
+            <span class:dark={$dark}>Find your Documents</span>
           </div>
         </Card>
       </div>
@@ -236,7 +236,10 @@
             {#if value.codeData === docid}
               <!-- {@const lastPath =
               value.documentPath[value.documentPath.length - 1]} -->
-              {#each value.documentPath.reverse() as pathValue, i (i)}
+              <!-- reverse Possible Problem -->
+              {#each Array(value.documentPath.length) as _, i (i)}
+                {@const pathValue =
+                  value.documentPath[value.documentPath.length - 1 - i]}
                 {#if pathValue.approved && pathValue.confirmed && pathValue.finished && pathValue.complete}
                   <div class="info-wrapper">
                     <div class="date-wrapper">
@@ -263,11 +266,8 @@
                         Status: Waiting for the recipient
                       </h3>
                       <span class:dark={$dark}
-                        >Lorem ipsum dolor sit amet consectetur adipisicing
-                        elit. Molestiae, provident. Quo ullam explicabo
-                        provident? Labore consectetur, obcaecati consequatur
-                        molestias dolorum eum ab animi aspernatur quo iste at
-                        numquam, temporibus in!</span
+                        >Your document is finished and is waiting for you to claim from {pathValue.name}.
+                        Please get your document immediately!</span
                       >
                     </div>
                   </div>
@@ -278,11 +278,7 @@
                     <div class="info">
                       <h3 class:dark={$dark}>Status: Finished</h3>
                       <span class:dark={$dark}
-                        >Lorem ipsum dolor sit amet consectetur adipisicing
-                        elit. Molestiae, provident. Quo ullam explicabo
-                        provident? Labore consectetur, obcaecati consequatur
-                        molestias dolorum eum ab animi aspernatur quo iste at
-                        numquam, temporibus in!</span
+                        >Your document has been processed successfully</span
                       >
                     </div>
                   </div>

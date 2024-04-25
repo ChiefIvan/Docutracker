@@ -195,6 +195,7 @@
           {shortcutData}
           {authToken}
           {editData}
+          on:switch={() => scanD = false}
           on:closeShortCut={() => (scanD = false)}
         ></ShortcutWrapper>
       {/if}

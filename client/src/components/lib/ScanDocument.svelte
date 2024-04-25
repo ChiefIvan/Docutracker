@@ -227,9 +227,15 @@
       };
     }
   };
+
+  const handleBack = () => {
+    dispatch("switch", "Scan Document");
+  }
 </script>
 
-<div class="qr-wrapper">
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<div class="qr-wrapper" on:click|self={handleBack}>
   <div class="scan" class:dark={$dark}>
     <div class="title-container">
       <WebcamIcon></WebcamIcon>
@@ -283,6 +289,8 @@
     <Button on:click={handleFileSystemScan}>Scan</Button>
   </div>
 </div>
+
+
 
 <style>
   div.qr-wrapper {

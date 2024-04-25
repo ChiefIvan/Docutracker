@@ -262,7 +262,7 @@
       newUser.cnfrmPassword = target.value;
     }
 
-    if (id === "Please Specify (N/A if not Applicable)") {
+    if (id === "N/A if None") {
       newUser.institute = target.value;
     }
   };
@@ -398,7 +398,7 @@
     newUser.institute = target.value;
   };
 
-  $: console.log(newUser.unit);
+  $: console.log(newUser.institute);
 </script>
 
 <svelte:head>
@@ -591,7 +591,7 @@
           <div class="others-wrapper">
             <Input
               inputType="text"
-              inputName="N/A if not Applicable"
+              inputName="N/A if None"
               verifiedEntry={instituteVerified}
               on:input={handleInput}
               bind:focusedInput={inputBinds.otherInput}

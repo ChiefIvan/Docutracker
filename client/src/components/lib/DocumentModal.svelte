@@ -269,7 +269,7 @@
       {#if $documentDetails.documentD.documentPath.length}
         {#if lastRoute.approved && !lastRoute.confirmed && !lastRoute.finished}
           {#if $filterName == "Self"}
-            {#if lastRoute.name === "Academic VP" || lastRoute.name === "Academic VP" || lastRoute.name === "VPAA" || lastRoute.name === "OP"}
+            {#if (lastRoute.name === "Academic VP" && $documentDetails.documentD.documentName === "Faculty Loading" && $documentDetails.documentD.documentName === "Requested Subject") || lastRoute.name === "VPAA" || lastRoute.name === "OP"}
               <Button hoverized={true} on:click={() => handleApproval("finish")}
                 >Finish (Applicable for the last route)</Button
               >

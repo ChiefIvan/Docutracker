@@ -45,7 +45,7 @@
 
           <!-- svelte-ignore missing-declaration -->
           <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-          {#if (!document.documentPath.length && $userData.unit === "Program Head") || (!document.documentPath.length && $userData.unit === "Dean Office" && document.documentName === "Application For Leave") || (!document.documentPath.length && $userData.unit === "HROS" && document.documentName === "Application For Leave")}
+          {#if (!document.documentPath.length && $userData.unit === "Program Head") || (!document.documentPath.length && $userData.unit === "Dean Office" && document.documentName === "Application for Leave") || (!document.documentPath.length && $userData.unit === "HROS" && document.documentName === "Application for Leave")}
             <li
               on:click={() =>
                 handleDetails(user.fullName, user.email, document, "tab1")}

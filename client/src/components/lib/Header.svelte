@@ -13,6 +13,7 @@
     notificationCount,
     address,
     notifications,
+    type RequestAPI,
   } from "../../store";
   import { tooltip } from "../shared/Tooltip";
   import { Link, navigate } from "svelte-routing";
@@ -78,6 +79,21 @@
   } else {
     document.body.classList.remove("disable-scroll");
   }
+
+  const logoutAddress = `${address}/logout`;
+  const logoutMethod = "GET";
+
+  const logoutRequest: RequestAPI = {
+    method: logoutMethod,
+    address: logoutAddress,
+  };
+
+  const handleLogout = async () => {
+    const token = sessionStorage.getItem("remember");
+    await handleFetch(logoutRequest, token);
+    sessionStorage.removeItem("remember");
+    window.location.href = "/";
+  };
 </script>
 
 <header class="header" class:dark={$dark} class:outside={$location === "/"}>
@@ -209,6 +225,9 @@
     </div>
     <!-- {:else} -->
     <!-- {/if} -->
+    <Button hoverized={true} critical={true} on:click={handleLogout}
+      >Logout</Button
+    >
   </div>
 {/if}
 

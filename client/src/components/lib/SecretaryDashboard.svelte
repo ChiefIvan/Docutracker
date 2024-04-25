@@ -1,226 +1,3 @@
-<!-- <script lang="ts">
-  import {
-    handleFetch,
-    address,
-    dark,
-    userData,
-    handleDetails,
-    detailsExpand,
-    users,
-    activeTab,
-    filterExpand,
-    filterName,
-    sortExpand,
-    type RequestAPI,
-    type ResponseData,
-    type Users,
-  } from "../../store";
-  import { navigate } from "svelte-routing";
-  import { onMount, createEventDispatcher, type EventDispatcher } from "svelte";
-  import { tooltip } from "../shared/Tooltip";
-  import { fade } from "svelte/transition";
-
-  import SecNav from "./SecNav.svelte";
-  import DocumentModal from "./DocumentModal.svelte";
-  import Dropdown from "../shared/Dropdown.svelte";
-  import TriangleIcon from "../icons/TriangleIcon.svelte";
-  import UserCard from "./UserCard.svelte";
-
-  type EventDispatcher<T> = (eventname: string, eventData: T) => void;
-  const dispatch: EventDispatcher<string> = createEventDispatcher();
-
-  // const handleDispatch = (item: string) => {
-  //   dispatch("tabChange", item);
-  // };
-
-  export let authToken: string;
-
-  const indexAddress = `${address}/get_all`;
-  const indexMethod = "GET";
-
-  let insName = "";
-
-  let forwardedDocuments: Users[] = [];
-  let approvedDocuments: Users[] = [];
-  let rejectedDocuments: Users[] = [];
-  let waitingDocuments: Users[] = [];
-  let completeDocuments: Users[] = [];
-
-  let orForwardedDocuments: Users[] = [];
-  let orApprovedDocuments: Users[] = [];
-  let orRejectedDocuments: Users[] = [];
-  let orWaitingDocuments: Users[] = [];
-  let orCompleteDocuments: Users[] = [];
-
-  const authRequest: RequestAPI = {
-    method: indexMethod,
-    address: indexAddress,
-  };
-
-  let route: string | undefined;
-
-  async function fetchDataAndDispatch() {
-    if (!authToken.length) {
-      console.warn("Auth Token is empty");
-      navigate("/auth/login");
-      return;
-    }
-
-    try {
-      const response: ResponseData = await handleFetch(authRequest, authToken);
-
-      if (response && response.users) {
-        $users = response.users;
-        route = response.unit;
-      }
-
-      $users.forEach((user) => {
-        let isForwarded = user.documents.some((doc) => {
-          if (doc.documentPath && doc.documentPath.length) {
-            return (
-              doc.documentPath[doc.documentPath.length - 1].approved &&
-              doc.documentPath[doc.documentPath.length - 1].confirmed &&
-              !doc.documentPath[doc.documentPath.length - 1].finished
-            );
-          }
-
-          return true;
-        });
-
-        if (isForwarded) {
-          forwardedDocuments = [...forwardedDocuments, user];
-          orForwardedDocuments = [...orForwardedDocuments, user];
-        }
-      });
-
-      $users.forEach((user) => {
-        let hasApproved = user.documents.some((doc) => {
-          if (!doc.documentPath.length) return false;
-          return (
-            doc.documentPath[doc.documentPath.length - 1].approved &&
-            !doc.documentPath[doc.documentPath.length - 1].confirmed &&
-            !doc.documentPath[doc.documentPath.length - 1].finished
-          );
-        });
-
-        if (hasApproved) {
-          approvedDocuments = [...approvedDocuments, user];
-          orApprovedDocuments = [...orApprovedDocuments, user];
-        }
-      });
-
-      $users.forEach((user) => {
-        let isRejected = user.documents.some((doc) => {
-          if (!doc.documentPath.length) {
-            return false;
-          }
-
-          return !doc.documentPath[doc.documentPath.length - 1].approved;
-        });
-
-        if (isRejected) {
-          rejectedDocuments = [...rejectedDocuments, user];
-          orRejectedDocuments = [...orRejectedDocuments, user];
-        }
-      });
-
-      $users.forEach((user) => {
-        let isWaiting = user.documents.some((doc) => {
-          if (!doc.documentPath.length) return false;
-          return (
-            doc.documentPath[doc.documentPath.length - 1].approved &&
-            doc.documentPath[doc.documentPath.length - 1].finished &&
-            !doc.documentPath[doc.documentPath.length - 1].complete
-          );
-        });
-
-        if (isWaiting) {
-          waitingDocuments = [...waitingDocuments, user];
-          orWaitingDocuments = [...orWaitingDocuments, user];
-        }
-      });
-
-      $users.forEach((user) => {
-        let isComplete = user.documents.some((doc) => {
-          if (!doc.documentPath.length) return false;
-          return (
-            doc.documentPath[doc.documentPath.length - 1].approved &&
-            !doc.documentPath[doc.documentPath.length - 1].confirmed &&
-            doc.documentPath[doc.documentPath.length - 1].finished &&
-            doc.documentPath[doc.documentPath.length - 1].complete
-          );
-        });
-
-        if (isComplete) {
-          completeDocuments = [...completeDocuments, user];
-          orCompleteDocuments = [...orCompleteDocuments, user];
-        }
-      });
-
-      $userData = response;
-    } catch (error) {
-      navigate("/auth/login");
-      console.error(error);
-    }
-  }
-
-  onMount(async () => {
-    await fetchDataAndDispatch();
-  });
-
-  let sortName = "Default";
-
-  const switchSortname = (name: string) => {
-    sortName = name;
-    $filterExpand = false;
-  };
-
-  const switchFiltername = (name: string) => {
-    forwardedDocuments = orForwardedDocuments;
-    approvedDocuments = orApprovedDocuments;
-    rejectedDocuments = orRejectedDocuments;
-    waitingDocuments = orWaitingDocuments;
-    completeDocuments = orCompleteDocuments;
-
-    $filterName = name;
-    insName = "";
-    $sortExpand = false;
-  };
-
-  const insFiltername = (name: string) => {
-    forwardedDocuments = orForwardedDocuments;
-    approvedDocuments = orApprovedDocuments;
-    rejectedDocuments = orRejectedDocuments;
-    waitingDocuments = orWaitingDocuments;
-    completeDocuments = orCompleteDocuments;
-
-    if (insName === name) {
-      insName = "";
-    } else {
-      forwardedDocuments = forwardedDocuments.filter(
-        (doc) => doc.institute === name
-      );
-
-      approvedDocuments = approvedDocuments.filter(
-        (doc) => doc.institute === name
-      );
-
-      rejectedDocuments = rejectedDocuments.filter(
-        (doc) => doc.institute === name
-      );
-
-      waitingDocuments = waitingDocuments.filter(
-        (doc) => doc.institute === name
-      );
-
-      completeDocuments = completeDocuments.filter(
-        (doc) => doc.institute === name
-      );
-      insName = name;
-    }
-  };
-</script> -->
-
 <script lang="ts">
   import {
     handleFetch,
@@ -300,7 +77,7 @@
             }
 
             if ($userData.unit === "Dean Office") {
-              if (user.unit === "Program Head") {
+              if (user.designation === "Program Head") {
                 if (doc.documentName === "Application for Leave") {
                   return true;
                 }
@@ -308,7 +85,7 @@
             }
 
             if ($userData.unit === "HROS") {
-              if (user.unit === "Dean Office") {
+              if (user.designation === "Dean Office") {
                 if (doc.documentName === "Application for Leave") {
                   return true;
                 }
@@ -438,6 +215,28 @@
                 if (doc.documentName === "Endorsement Form") {
                   return true;
                 }
+              }
+            }
+
+            if (
+              doc.documentPath[doc.documentPath.length - 1].name === "OP" &&
+              doc.documentPath[doc.documentPath.length - 1].approved &&
+              !doc.documentPath[doc.documentPath.length - 1].confirmed 
+            ) {
+              if (doc.documentName === "Endorsement Form") {
+                return true;
+              }
+            }
+
+            if (
+              doc.documentPath[doc.documentPath.length - 1].name === "OP" &&
+              doc.documentPath[doc.documentPath.length - 1].approved &&
+              doc.documentPath[doc.documentPath.length - 1].confirmed &&
+              doc.documentPath[doc.documentPath.length - 1].finished &&
+              !doc.documentPath[doc.documentPath.length - 1].complete
+            ) {
+              if (doc.documentName === "Endorsement Form") {
+                return true;
               }
             }
 
@@ -637,58 +436,11 @@
           }}
         ></TriangleIcon>
       </div>
-      <Dropdown expand={$filterExpand} secretary={true}>
-        <h2 class="dropdown-title" class:dark={$dark}>Category</h2>
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <li on:click={() => switchFiltername("All")}>
-          <span class="mode-name" class:active={$filterName === "All"}>All</span
-          >
-        </li>
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-        <li on:click={() => switchFiltername("Self")}>
-          <span class="mode-name" class:active={$filterName === "Self"}
-            >Self</span
-          >
-        </li>
-        <h2 class="dropdown-title" class:dark={$dark} style="margin-top: 1rem;">
-          Filter
-        </h2>
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-        <li on:click={() => insFiltername("FGBM")}>
-          <span class="mode-name" class:active={insName === "FGBM"}>FGBM</span>
-        </li>
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-        <li on:click={() => insFiltername("FCDSET")}>
-          <span class="mode-name" class:active={insName === "FCDSET"}
-            >FCDSET</span
-          >
-        </li>
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-        <li on:click={() => insFiltername("FNAHS")}>
-          <span class="mode-name" class:active={insName === "FNAHS"}>FNAHS</span
-          >
-        </li>
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-        <li on:click={() => insFiltername("FALS")}>
-          <span class="mode-name" class:active={insName === "FALS"}>FALS</span>
-        </li>
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-        <li on:click={() => insFiltername("FTED")}>
-          <span class="mode-name" class:active={insName === "FTED"}>FTED</span>
-        </li>
-      </Dropdown>
     </div>
 
     <UserCard filteredArray={documents} {route}></UserCard>
   {:else}
-    <h1>You don't have any transactions yet!</h1>
+    <h1 class="empty-message">You don't have any transactions yet!</h1>
   {/if}
 
   <!-- {#if $activeTab === "Forward"}
@@ -724,6 +476,13 @@
 </main>
 
 <style>
+
+  h1.empty-message {
+    line-height: 90vh;
+    text-align: center;
+    font-weight: bold;
+    font-size: 3rem;
+  } 
   main {
     max-width: 1300px;
     margin: auto;
