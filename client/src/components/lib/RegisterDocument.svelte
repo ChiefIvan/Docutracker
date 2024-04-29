@@ -193,10 +193,10 @@
       id: 3,
       name: "Endorsement Form",
     },
-    {
-      id: 4,
-      name: "Application for Leave",
-    },
+    // {
+    //   id: 4,
+    //   name: "Application for Leave",
+    // },
   ];
 </script>
 

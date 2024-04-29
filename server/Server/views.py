@@ -153,6 +153,7 @@ def get_all_documents() -> dict:
 def document_approval() -> dict:
     if request.method == "POST":
         data = request.json
+        print(data)
         document: Documents = Documents.query.filter_by(
             code=data["codeData"]).first()
 
@@ -227,7 +228,7 @@ def document_approval() -> dict:
 
         elif data["approval"] == "confirm":
             if not route:
-                return jsonify({"error", "There's no document, please register one first!"})
+                return jsonify({"error": "There's no document, please register one first!"})
 
             route.confirmed = True
             route.confirmed_date = datetime.now()
@@ -244,7 +245,7 @@ def document_approval() -> dict:
 
         elif data["approval"] == "finish":
             if not route:
-                return jsonify({"error", "There's no document, please register one first!"})
+                return jsonify({"error": "There's no document, please register one first!"})
 
             route.confirmed = True
             route.confirmed_date = datetime.now()
@@ -263,7 +264,7 @@ def document_approval() -> dict:
 
         elif data["approval"] == "complete":
             if not route:
-                return jsonify({"error", "There's no document, please register one first!"})
+                return jsonify({"error": "There's no document, please register one first!"})
 
             route.complete = True
             route.complete_date = datetime.now()
@@ -280,7 +281,7 @@ def document_approval() -> dict:
 
         else:
             if not route:
-                return jsonify({"error", "There's no document, please register one first!"})
+                return jsonify({"error": "There's no document, please register one first!"})
 
             db.session.delete(route)
             document.attemp += 1

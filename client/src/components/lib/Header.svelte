@@ -208,6 +208,15 @@
       >
         Hello, {$userData.fullName}!
       </p>
+      <p
+        transition:fly={{ y: -40, duration: 400, delay: 150 }}
+        class="status-wrapper"
+        class:dark={$dark}
+      >
+        {$userData.institute}
+
+        {$userData.unit}
+      </p>
     </div>
     <div class="button-wrapper">
       <h3 class:verified={$userData.full_ver_val}>

@@ -319,11 +319,7 @@
                   >
                     {document.documentDescription}
                   </div>
-                  <div
-                    class="name"
-                    class:dark={$dark}
-                    title={document.attemps.toString()}
-                  >
+                  <div class="name" class:dark={$dark} title={document.attemps}>
                     {document.attemps}
                   </div>
                   <div class="id" class:dark={$dark} title={document.codeData}>
@@ -370,11 +366,7 @@
                   >
                     {document.documentDescription}
                   </div>
-                  <div
-                    class="name"
-                    class:dark={$dark}
-                    title={document.attemps.toString()}
-                  >
+                  <div class="name" class:dark={$dark} title={document.attemps}>
                     {document.attemps}
                   </div>
                   <div class="id" class:dark={$dark} title={document.codeData}>
@@ -423,11 +415,7 @@
                   >
                     {document.documentDescription}
                   </div>
-                  <div
-                    class="name"
-                    class:dark={$dark}
-                    title={document.attemps.toString()}
-                  >
+                  <div class="name" class:dark={$dark} title={document.attemps}>
                     {document.attemps}
                   </div>
                   <div class="id" class:dark={$dark} title={document.codeData}>
@@ -467,11 +455,7 @@
                   >
                     {document.documentDescription}
                   </div>
-                  <div
-                    class="name"
-                    class:dark={$dark}
-                    title={document.attemps.toString()}
-                  >
+                  <div class="name" class:dark={$dark} title={document.attemps}>
                     {document.attemps}
                   </div>
                   <div class="id" class:dark={$dark} title={document.codeData}>
@@ -511,11 +495,7 @@
                   >
                     {document.documentDescription}
                   </div>
-                  <div
-                    class="name"
-                    class:dark={$dark}
-                    title={document.attemps.toString()}
-                  >
+                  <div class="name" class:dark={$dark} title={document.attemps}>
                     {document.attemps}
                   </div>
                   <div class="id" class:dark={$dark} title={document.codeData}>

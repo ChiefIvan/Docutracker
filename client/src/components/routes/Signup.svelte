@@ -542,28 +542,7 @@
     <div class="main-select-wrapper">
       <div class="select-wrapper">
         <label for="institute-select" class="select-title" class:dark={$dark}
-          >Designation</label
-        >
-        <select
-          class="institutes"
-          on:change={(event) => {
-            newUser.unit = event?.target.value;
-          }}
-          name="institutes"
-          id="institute-select"
-        >
-          <option value="">Select an Option</option>
-          <option value="Program Head">Program Head</option>
-          <option value="Dean Office">Dean Office</option>
-          <option value="Academic VP">Academic VP</option>
-          <option value="HROS">HROS</option>
-          <option value="VPAA">VPAA</option>
-        </select>
-      </div>
-
-      <div class="select-wrapper">
-        <label for="institute-select" class="select-title" class:dark={$dark}
-          >Institute</label
+          >Institute/Office</label
         >
         <select
           class="institutes"
@@ -600,6 +579,29 @@
             />
           </div>
         {/if}
+      </div>
+      <div class="select-wrapper">
+        <label for="institute-select" class="select-title" class:dark={$dark}
+          >Designation</label
+        >
+        <select
+          class="institutes"
+          on:change={(event) => {
+            newUser.unit = event?.target.value;
+          }}
+          name="institutes"
+          id="institute-select"
+        >
+          <option value="">Select an Option</option>
+          <option value="Program Head">Program Head</option>
+          <option value="Dean Office">Dean Office</option>
+          <option value="Academic VP">Academic VP</option>
+          <!-- <option value="Secretary">Secretary</option> -->
+          <option value="OP">OP</option>
+
+          <!-- <option value="HROS">HROS</option> -->
+          <!-- <option value="VPAA">VPAA</option> -->
+        </select>
       </div>
     </div>
 

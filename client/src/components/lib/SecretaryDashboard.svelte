@@ -221,7 +221,7 @@
             if (
               doc.documentPath[doc.documentPath.length - 1].name === "OP" &&
               doc.documentPath[doc.documentPath.length - 1].approved &&
-              !doc.documentPath[doc.documentPath.length - 1].confirmed 
+              !doc.documentPath[doc.documentPath.length - 1].confirmed
             ) {
               if (doc.documentName === "Endorsement Form") {
                 return true;
@@ -348,7 +348,7 @@
 
 <!-- <SecNav></SecNav> -->
 {#if $detailsExpand}
-  <DocumentModal {authToken} {route}></DocumentModal>
+  <DocumentModal {authToken}></DocumentModal>
 {/if}
 
 <main>
@@ -435,9 +435,24 @@
             $sortExpand = false;
           }}
         ></TriangleIcon>
+        <Dropdown expand={$filterExpand} secretary={true}>
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+          <li on:click={() => switchFiltername("All")}>
+            <span class="mode-name" class:active={$filterName === "All"}
+              >All</span
+            >
+          </li>
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+          <li on:click={() => switchFiltername("Self")}>
+            <span class="mode-name" class:active={$filterName === "Self"}
+              >Self</span
+            >
+          </li>
+        </Dropdown>
       </div>
     </div>
-
     <UserCard filteredArray={documents} {route}></UserCard>
   {:else}
     <h1 class="empty-message">You don't have any transactions yet!</h1>
@@ -476,13 +491,13 @@
 </main>
 
 <style>
-
   h1.empty-message {
     line-height: 90vh;
     text-align: center;
     font-weight: bold;
     font-size: 3rem;
-  } 
+  }
+
   main {
     max-width: 1300px;
     margin: auto;

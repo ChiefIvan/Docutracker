@@ -20,7 +20,6 @@
   import QrCode from "svelte-qrcode";
 
   export let authToken = "";
-  export let route: string = "";
 
   let commentValue = "";
   let openComment = false;
@@ -38,7 +37,10 @@
 
   const handleApproval = async (args: string) => {
     approvalRequest.credentials!.approval = args;
-    approvalRequest.credentials!.unit = route;
+    approvalRequest.credentials!.unit =
+      $documentDetails.documentD.documentPath[
+        $documentDetails.documentD.documentPath.length - 1
+      ].name;
     approvalRequest.credentials!.codeData = $documentDetails.documentD.codeData;
     approvalRequest.credentials!.comment = commentValue;
 
@@ -83,7 +85,6 @@
     $documentDetails.documentD.documentPath[
       $documentDetails.documentD.documentPath.length - 1
     ];
-
 </script>
 
 {#if openComment}
@@ -219,7 +220,7 @@
                 {:else}
                   Program Head / HROS / VPAA
                 {/if}
-              {:else if $userData.previlage === "Secretary"}  
+              {:else if $userData.previlage === "Secretary"}
                 {#if $userData.users && $userData.users.length}
                   {#each $userData.users as user, i (i)}
                     {#if $documentDetails.emailD === user.email}

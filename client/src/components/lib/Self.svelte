@@ -219,6 +219,13 @@
 
 <style>
   section.content-wrapper {
+    & h2.no-document {
+      line-height: 90vh;
+      text-align: center;
+      font-weight: bold;
+      font-size: 3rem;
+    }
+
     & div.table-wrapper {
       & div.table {
         transition: all ease-in-out 500ms;
