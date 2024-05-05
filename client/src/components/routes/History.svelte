@@ -6,8 +6,8 @@
     sortExpand,
     searchArray,
     sortArray,
-    handleDetails,
     detailsExpand,
+    type Document,
   } from "../../store";
   import { onDestroy } from "svelte";
   import { tooltip } from "../shared/Tooltip";
@@ -17,13 +17,9 @@
   import Dropdown from "../shared/Dropdown.svelte";
   import TriangleIcon from "../icons/TriangleIcon.svelte";
   import DocumentModal from "../lib/DocumentModal.svelte";
+  import DocumentCredentials from "../lib/documentCredentials.svelte";
 
   export let authToken = "";
-
-  // const handleExpand = (name: string) => {
-  //   // This function is used to expand the whatever use has selected
-  // };
-
   onDestroy(() => ($documentSelected = ""));
 
   let sortName = "Default";
@@ -35,6 +31,13 @@
 
   let left = false;
   let right = false;
+  let isOpen = false;
+  let document: Document;
+
+  const handleDocumentCredentials = (args: Document) => {
+    isOpen = !isOpen;
+    document = args;
+  };
 </script>
 
 <svelte:head>
@@ -42,6 +45,11 @@
 </svelte:head>
 
 <CheckAuthenticity {authToken} on:user></CheckAuthenticity>
+
+{#if isOpen}
+  <DocumentCredentials theDocument={document} on:close={() => (isOpen = false)}
+  ></DocumentCredentials>
+{/if}
 
 {#if $detailsExpand}
   <DocumentModal {authToken}></DocumentModal>
@@ -102,45 +110,43 @@
           </li>
         </Dropdown>
       </div>
-      <div class="table-head">
-        <h2 class="title-name">Document Name</h2>
-        <h2 class="title-status">Status</h2>
+      <div class="table-head" class:dark={$dark}>
+        <h2 class="title-name" class:dark={$dark}>Document Name</h2>
+        <h2 class="title-status" class:dark={$dark}>Status</h2>
       </div>
       <ul class="list-wrapper">
-        {#each allDocuments as document, i (document.documentID)}
-          {#if document.documentPath.length}
-            {@const path =
-              document.documentPath[document.documentPath.length - 1]}
-            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-            {#if (path.approved && !path.confirmed && path.finished && path.complete) || !path.approved}
-              <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <li
-                use:tooltip={{
-                  content: "Click for full details",
-                  animation: "perspective-subtle",
-                  theme: "tooltip",
-                  arrow: true,
-                  offset: [0, 15],
-                }}
-                transition:fade
-                on:click|stopPropagation={() => handleDetails("", "", document)}
-              >
-                <h2 class="name">
-                  {document.documentName}
-                </h2>
-                <span class="status">
-                  {#each document.documentPath as path, i (i)}
-                    {#if path.approved && !path.confirmed && path.finished && path.complete}
-                      complete
-                    {:else if !path.approved && !path.confirmed && !path.finished && !path.complete}
-                      Unsuccessful
-                    {/if}
-                  {/each}
-                </span>
-              </li>
+        {#if allDocuments.length}
+          {#each allDocuments as document (document.documentID)}
+            {#if document.documentPath.length}
+              {@const path =
+                document.documentPath[document.documentPath.length - 1]}
+              <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+              {#if path.approved && path.confirmed && path.finished && path.complete}
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <li
+                  use:tooltip={{
+                    content: "Click for full details",
+                    animation: "perspective-subtle",
+                    theme: "tooltip",
+                    arrow: true,
+                    offset: [0, 15],
+                  }}
+                  transition:fade
+                  class:dark={$dark}
+                  on:click|stopPropagation={() =>
+                    handleDocumentCredentials(document)}
+                >
+                  <h2 class="name" class:dark={$dark}>
+                    {document.documentName}
+                  </h2>
+                  <span class="status" class:dark={$dark}> complete </span>
+                </li>
+              {/if}
             {/if}
-          {/if}
-        {/each}
+          {/each}
+        {:else}
+          No Match
+        {/if}
       </ul>
     </div>
   {:else}
@@ -253,6 +259,7 @@
       }
 
       & div.table-head {
+        transition: all ease-in-out 300ms;
         display: flex;
         border: 1px solid var(--header-color);
         border-radius: 1rem;
@@ -261,6 +268,7 @@
           font-weight: 700;
           color: var(--main-col-3);
           padding: 1rem 1rem;
+          transition: all ease-in-out 300ms;
         }
 
         & h2.title-name {
@@ -272,11 +280,21 @@
           border-left: 1px solid var(--header-color);
           flex: 1;
         }
+
+        & h2.dark {
+          color: var(--background);
+          border-color: var(--input-color);
+        }
+      }
+
+      & div.table-head.dark {
+        border-color: var(--input-color);
       }
 
       & ul.list-wrapper {
         & li {
           padding: 0.5rem 1rem;
+          transition: all ease-in-out 300ms;
 
           display: flex;
           cursor: pointer;
@@ -284,17 +302,31 @@
           & h2.name {
             flex: 3;
             color: var(--main-col-3);
+            transition: all ease-in-out 300ms;
+          }
+
+          & h2.name.dark {
+            color: var(--main-col-2);
           }
 
           & span.status {
             padding-left: 1rem;
             flex: 1;
             color: var(--main-col-1);
+            transition: all ease-in-out 300ms;
+          }
+
+          & span.status.dark {
+            color: var(--main-col-2);
           }
         }
 
         & li:nth-child(even) {
           background-color: var(--main-col-5);
+        }
+
+        & li.dark:nth-child(even) {
+          background-color: var(--dark-main-col-6);
         }
       }
     }

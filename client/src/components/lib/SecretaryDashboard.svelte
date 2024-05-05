@@ -65,7 +65,10 @@
       $users.forEach((user) => {
         let isValid = user.documents.some((doc) => {
           if (!doc.documentPath.length) {
-            if ($userData.unit === "Program Head") {
+            if (
+              $userData.unit === "Program Head" &&
+              $userData.institute === doc.documentProgram
+            ) {
               if (
                 doc.documentName === "Faculty Loading" ||
                 doc.documentName === "Requested Subject" ||

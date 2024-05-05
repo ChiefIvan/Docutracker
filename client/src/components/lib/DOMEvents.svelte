@@ -5,6 +5,7 @@
     profileExpand,
     actionExpand,
     selectExpand,
+    selectProgramExpand,
     dark,
     sortExpand,
     filterExpand,
@@ -30,6 +31,10 @@
 
     if ($selectExpand) {
       $selectExpand = false;
+    }
+
+    if ($selectProgramExpand) {
+      $selectProgramExpand = false
     }
 
     if ($sortExpand) {

@@ -5,6 +5,7 @@
     address,
     showMessage,
     selectExpand,
+    selectProgramExpand,
     modeExpand,
     userData,
     documents,
@@ -13,6 +14,7 @@
   } from "../../store";
   import { v4 as uuidv4 } from "uuid";
   import { fade } from "svelte/transition";
+  import { tooltip } from "../shared/Tooltip";
   import { createEventDispatcher, onDestroy, onMount } from "svelte";
 
   import QrCode from "svelte-qrcode";
@@ -70,14 +72,17 @@
   };
 
   let documentDescription = "";
+  let programSelected = "";
   let documentSelected = "";
   let edit = false;
 
   onMount(() => {
     if (editData && Object.keys(editData).length !== 0) {
-      const { documentName, codeData, documentDes, isEdit } = editData;
+      const { documentName, documentProgram, codeData, documentDes, isEdit } =
+        editData;
 
       documentSelected = documentName;
+      programSelected = documentProgram;
       documentDescription = documentDes;
       value = codeData;
       edit = isEdit;
@@ -92,6 +97,7 @@
     credentials: {
       codeData: "",
       documentName: "",
+      documentProgram: "",
       documentDescription: "",
       edit: false,
     },
@@ -100,11 +106,17 @@
   const handleSubmit = async () => {
     registrationRequest.credentials!.codeData = value;
     registrationRequest.credentials!.documentName = documentSelected;
+    registrationRequest.credentials!.documentProgram = programSelected;
     registrationRequest.credentials!.documentDescription = documentDescription;
     registrationRequest.credentials!.edit = edit;
 
     if (!documentSelected.length) {
       $showMessage = { error: "Please Select a Document first!" };
+      return;
+    }
+
+    if (!programSelected.length) {
+      $showMessage = { error: "Please Select a Program first!" };
       return;
     }
 
@@ -155,6 +167,7 @@
           codeData: value,
           attemps: 0,
           documentName: documentSelected,
+          documentProgram: programSelected,
           documentDescription: documentDescription,
           pendingDate: date.toISOString(),
           documentPath: [],
@@ -169,6 +182,11 @@
 
   const handleExpand = () => {
     $selectExpand = !$selectExpand;
+    $modeExpand = false;
+  };
+
+  const handleProgramExpand = () => {
+    $selectProgramExpand = !$selectProgramExpand;
     $modeExpand = false;
   };
 
@@ -198,6 +216,25 @@
     //   name: "Application for Leave",
     // },
   ];
+
+  const programSelection = [
+    {
+      id: 1,
+      name: "BSMATH",
+    },
+    {
+      id: 2,
+      name: "BSCE",
+    },
+    {
+      id: 3,
+      name: "BITM",
+    },
+    {
+      id: 4,
+      name: "BSIT",
+    },
+  ];
 </script>
 
 <div class="register-document-wrapper">
@@ -211,51 +248,102 @@
       <!-- svelte-ignore missing-declaration -->
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div class="selected-wrapper" on:click|stopPropagation={handleExpand}>
-        <div class="selected" class:dark={$dark}>
-          <p class:dark={$dark}>
-            {#if documentSelected.length !== 0}
-              {documentSelected}:
-              {#if documentSelected === "Faculty Loading"}
-                Program Head -> Dean Office -> Academic VP
-              {:else if documentSelected === "Requested Subject"}
-                Program Head -> Dean Office -> Academic VP
-              {:else if documentSelected === "Endorsement Form"}
-                Program Head -> Dean Office -> Academic VP -> OP
-              {:else if documentSelected === "Application for Leave"}
-                {#if $userData.unit === "Program Head"}
-                  Dean Office / HROS / VPAA
-                {:else if $userData.unit === "Dean Office"}
-                  HROS / VPAA
-                {:else}
-                  Program Head / HROS / VPAA
+      <div class="select-wrapper">
+        <div
+          class="selected-wrapper"
+          style="flex: 2;"
+          on:click|stopPropagation={handleExpand}
+        >
+          <div class="selected" class:dark={$dark}>
+            <p class:dark={$dark}>
+              {#if documentSelected.length !== 0}
+                {documentSelected}:
+                {#if documentSelected === "Faculty Loading"}
+                  Program Head -> Dean Office -> Academic VP
+                {:else if documentSelected === "Requested Subject"}
+                  Program Head -> Dean Office -> Academic VP
+                {:else if documentSelected === "Endorsement Form"}
+                  Program Head -> Dean Office -> Academic VP -> OP
+                {:else if documentSelected === "Application for Leave"}
+                  {#if $userData.unit === "Program Head"}
+                    Dean Office / HROS / VPAA
+                  {:else if $userData.unit === "Dean Office"}
+                    HROS / VPAA
+                  {:else}
+                    Program Head / HROS / VPAA
+                  {/if}
                 {/if}
+              {:else}
+                Please select a document
               {/if}
-            {:else}
-              Please select a document
-            {/if}
-          </p>
-          <TriangleIcon rotate={$selectExpand}></TriangleIcon>
-        </div>
-        <Dropdown expand={$selectExpand} docs={true}>
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-          {#each documentsSelection as value (value.id)}
-            <li
-              class="list-wrapper"
-              class:active={value.name === documentSelected}
-              class:dark={$dark}
-              on:click={() => (documentSelected = value.name)}
-            >
-              <span
-                class="document-name"
-                class:dark={$dark}
+            </p>
+            <TriangleIcon rotate={$selectExpand}></TriangleIcon>
+          </div>
+          <Dropdown expand={$selectExpand} docs={true}>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+            {#each documentsSelection as value (value.id)}
+              <li
+                class="list-wrapper"
                 class:active={value.name === documentSelected}
-                >{value.name}</span
+                class:dark={$dark}
+                on:click={() => (documentSelected = value.name)}
               >
-            </li>
-          {/each}
-        </Dropdown>
+                <span
+                  class="document-name"
+                  class:dark={$dark}
+                  class:active={value.name === documentSelected}
+                  >{value.name}</span
+                >
+              </li>
+            {/each}
+          </Dropdown>
+        </div>
+        {#if documentSelected.length !== 0}
+          <div
+            class="selected-wrapper"
+            on:click|stopPropagation={handleProgramExpand}
+            transition:fade
+            use:tooltip={{
+              content:
+                "The first route of this document is Program Head, you must select what program of the Program Head that recieves this document",
+              animation: "perspective-subtle",
+              theme: "tooltip",
+              offset: [0, 0],
+              placement: "bottom",
+            }}
+          >
+            <div class="selected" class:dark={$dark}>
+              <p class:dark={$dark}>
+                {#if programSelected.length !== 0}
+                  {programSelected}
+                {:else}
+                  Please select a Program
+                {/if}
+              </p>
+              <TriangleIcon rotate={$selectProgramExpand}></TriangleIcon>
+            </div>
+            <Dropdown expand={$selectProgramExpand} docs={true}>
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
+              <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+              {#each programSelection as value (value.id)}
+                <li
+                  class="list-wrapper"
+                  class:active={value.name === programSelected}
+                  class:dark={$dark}
+                  on:click={() => (programSelected = value.name)}
+                >
+                  <span
+                    class="document-name"
+                    class:dark={$dark}
+                    class:active={value.name === programSelected}
+                    >{value.name}</span
+                  >
+                </li>
+              {/each}
+            </Dropdown>
+          </div>
+        {/if}
       </div>
 
       <textarea
@@ -395,59 +483,66 @@
         width: 100%;
         position: relative;
 
-        & div.selected-wrapper {
-          position: relative;
+        & div.select-wrapper {
+          display: flex;
+          column-gap: 1rem;
+          align-items: start;
 
-          & div.selected {
-            transition: all ease-in-out 300ms;
-            border: 1px solid var(--header-color);
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            color: var(--scroll-color);
-            margin: 1rem 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
+          & div.selected-wrapper {
+            position: relative;
+            flex: 1;
 
-            & p {
-              font-weight: 700;
-            }
-          }
+            & div.selected {
+              transition: all ease-in-out 300ms;
+              border: 1px solid var(--header-color);
+              padding: 0.5rem;
+              border-radius: 0.5rem;
+              color: var(--scroll-color);
+              margin: 1rem 0;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              cursor: pointer;
 
-          & div.selected:hover {
-            border-color: var(--border-hover-color);
-          }
-
-          & div.dark {
-            border-color: var(--input-color);
-            color: var(--background);
-          }
-
-          & li.list-wrapper {
-            & span.document-name {
-              font-weight: 400;
+              & p {
+                font-weight: 700;
+              }
             }
 
-            & span.document-name.dark {
-              color: var(--header-color);
+            & div.selected:hover {
+              border-color: var(--border-hover-color);
             }
 
-            & span.document-name.active {
-              color: var(--icon-active-color);
+            & div.dark {
+              border-color: var(--input-color);
+              color: var(--background);
             }
-          }
 
-          & li.active {
-            background-color: var(--component-active);
-          }
+            & li.list-wrapper {
+              & span.document-name {
+                font-weight: 400;
+              }
 
-          & li.active.dark {
-            background-color: var(--dark-main-col-5);
-          }
+              & span.document-name.dark {
+                color: var(--header-color);
+              }
 
-          & li.list-wrapper:hover span.document-name {
-            color: var(--scroll-color);
+              & span.document-name.active {
+                color: var(--icon-active-color);
+              }
+            }
+
+            & li.active {
+              background-color: var(--component-active);
+            }
+
+            & li.active.dark {
+              background-color: var(--dark-main-col-5);
+            }
+
+            & li.list-wrapper:hover span.document-name {
+              color: var(--scroll-color);
+            }
           }
         }
 

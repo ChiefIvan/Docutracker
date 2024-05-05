@@ -39,13 +39,13 @@
                 <div>
                   {document.pendingDate}
                 </div>
-              </div>
+              </div> 
             </li>
           {/if}
 
           <!-- svelte-ignore missing-declaration -->
           <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-          {#if (!document.documentPath.length && $userData.unit === "Program Head") || (!document.documentPath.length && $userData.unit === "Dean Office" && document.documentName === "Application for Leave") || (!document.documentPath.length && $userData.unit === "HROS" && document.documentName === "Application for Leave")}
+          {#if (!document.documentPath.length && $userData.unit === "Program Head" && $userData.institute === document.documentProgram) || (!document.documentPath.length && $userData.unit === "Dean Office" && document.documentName === "Application for Leave") || (!document.documentPath.length && $userData.unit === "HROS" && document.documentName === "Application for Leave")}
             <li
               on:click={() =>
                 handleDetails(user.fullName, user.email, document, "tab1")}

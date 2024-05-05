@@ -119,6 +119,7 @@ def get_all_documents() -> dict:
                     document_data = {
                         "documentID": document.id,
                         "documentName": document.name,
+                        "documentProgram": document.program,
                         "attemps": document.attemp,
                         "codeData": document.code,
                         "documentDescription": document.description,
@@ -343,6 +344,7 @@ def index():
             document_data = {
                 "documentID": document.id,
                 "documentName": document.name,
+                "documentProgram": document.program,
                 "attemps": document.attemp,
                 "codeData": document.code,
                 "documentDescription": document.description,
@@ -424,21 +426,23 @@ def document_register():
 
     if request.method == "POST":
         data = request.json
+
         code = data["codeData"]
         document_name = data["documentName"]
+        document_program = data["documentProgram"]
         description = data["documentDescription"]
         edit = data["edit"]
 
         print(data)
 
         entry_validate: RegisterEntryValidator = RegisterEntryValidator(
-            code, document_name, description).validate()
+            code, document_name, document_program, description).validate()
 
         if isinstance(entry_validate, dict):
             return jsonify(entry_validate)
 
         sanitize: bool | dict = Sanitizer(
-            {"Document Name": document_name, "Document Code": code,
+            {"Document Name": document_name, "Program": document_program, "Document Code": code,
                 "Document Descripttion": description}
         ).validate()
 
@@ -452,6 +456,7 @@ def document_register():
                 return jsonify({"error": "There's no document assciated with this document!"})
 
             document.name = document_name
+            document.program = document_program
             document.description = description
 
             db.session.commit()
@@ -460,6 +465,7 @@ def document_register():
         try:
             document: Documents = Documents(
                 name=document_name,
+                program=document_program,
                 code=code,
                 attemp=0,
                 description=description,

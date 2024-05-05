@@ -277,9 +277,33 @@
     credentials: newUser,
   };
 
+  const programs = ["BSMATH", "BSCE", "BITM", "BSIT"];
+  const unitsRequiringNotApplicable = ["Academic VP", "Dean Office", "OP"];
+
   const handleSubmit = async () => {
     if (!croppedImage || (croppedImage && !croppedImage.length)) {
       $showMessage = { error: "Please Select an Image for your Profile!" };
+      return;
+    }
+
+    if (
+      newUser.unit === "Program Head" &&
+      !programs.includes(newUser.institute)
+    ) {
+      console.log(newUser);
+      $showMessage = {
+        error: "If you're a Program Head, please Select a proper Program",
+      };
+      return;
+    }
+
+    if (
+      unitsRequiringNotApplicable.includes(newUser.unit) &&
+      programs.includes(newUser.institute)
+    ) {
+      $showMessage = {
+        error: "If you're not a Program Head, please Select Not Applicable",
+      };
       return;
     }
 
@@ -391,11 +415,6 @@
 
     attemps = 3;
     captchaImage = "";
-  };
-
-  const handleRadio = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    newUser.institute = target.value;
   };
 
   $: console.log(newUser.institute);
@@ -542,47 +561,7 @@
     <div class="main-select-wrapper">
       <div class="select-wrapper">
         <label for="institute-select" class="select-title" class:dark={$dark}
-          >Institute/Office</label
-        >
-        <select
-          class="institutes"
-          on:change={(event) => {
-            othersRev = event?.target.value === "others" ? true : false;
-            if (othersRev) {
-              newUser.institute = "";
-            }
-
-            newUser.institute = event?.target.value;
-          }}
-          name="institutes"
-          id="institute-select"
-        >
-          <option value="">Select an Option</option>
-          <option value="fcdset">FCDSET</option>
-          <option value="fnahs">FNAHS</option>
-          <option value="false">FALS</option>
-          <option value="fted">FTED</option>
-          <option value="fcdset">FCDSET</option>
-          <option value="fgbm">FGBM</option>
-          <option value="others">Others: Please Specify</option>
-        </select>
-        {#if othersRev}
-          <div class="others-wrapper">
-            <Input
-              inputType="text"
-              inputName="N/A if None"
-              verifiedEntry={instituteVerified}
-              on:input={handleInput}
-              bind:focusedInput={inputBinds.otherInput}
-              dark={$dark}
-              overlap={true}
-            />
-          </div>
-        {/if}
-      </div>
-      <div class="select-wrapper">
-        <label for="institute-select" class="select-title" class:dark={$dark}
-          >Designation</label
+          >Designation/Office</label
         >
         <select
           class="institutes"
@@ -602,6 +581,40 @@
           <!-- <option value="HROS">HROS</option> -->
           <!-- <option value="VPAA">VPAA</option> -->
         </select>
+      </div>
+
+      <div class="select-wrapper">
+        <label for="programs-select" class="select-title" class:dark={$dark}
+          >Program</label
+        >
+        <select
+          class="institutes"
+          on:change={(event) => {
+            newUser.institute = event?.target.value;
+          }}
+          name="programs"
+          id="programs-select"
+        >
+          <option value="">Select an Option</option>
+          <option value="BSMATH">BSMATH</option>
+          <option value="BSCE">BSCE</option>
+          <option value="BITM">BITM</option>
+          <option value="BSIT">BSIT</option>
+          <option value="others">Not Applicable</option>
+        </select>
+        <!-- {#if othersRev}
+          <div class="others-wrapper">
+            <Input
+              inputType="text"
+              inputName="N/A if None"
+              verifiedEntry={instituteVerified}
+              on:input={handleInput}
+              bind:focusedInput={inputBinds.otherInput}
+              dark={$dark}
+              overlap={true}
+            />
+          </div>
+        {/if} -->
       </div>
     </div>
 

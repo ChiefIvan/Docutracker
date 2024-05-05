@@ -23,14 +23,14 @@
   import Header from "./components/lib/Header.svelte";
   import DomEvents from "./components/lib/DOMEvents.svelte";
   import SideBar from "./components/lib/SideBar.svelte";
-  import UserRegistration from "./components/lib/UserRegistration.svelte";
+  // import UserRegistration from "./components/lib/UserRegistration.svelte";
   import Notification from "./components/routes/Notification.svelte";
   import Analytics from "./components/routes/Analytics.svelte";
   // import DocumentOverview from "./components/routes/DocumentOverview.svelte";
   import ShortcutWrapper from "./components/shared/ShortcutWrapper.svelte";
   import SuperUserLogin from "./components/routes/SuperUserLogin.svelte";
   import AdminInterface from "./components/routes/AdminInterface.svelte";
-  import Reports from "./components/routes/Reports.svelte";
+  // import Reports from "./components/routes/Reports.svelte";
 
   let show: boolean = false;
   let id: string | number | NodeJS.Timeout | undefined;
@@ -74,6 +74,7 @@
   const handleEdit = (event: {
     detail: {
       documentName: string;
+      documentProgram: string;
       codeData: string;
       documentDescription: string;
       isEdit: boolean;
@@ -138,9 +139,9 @@
           {authToken}
         />
       </Route>
-      <Route path="/reports">
+      <!-- <Route path="/reports">
         <Reports />
-      </Route>
+      </Route> -->
       <!-- {#if $userData.previlage === "User"} -->
       <Route path="/history">
         <Updates {authToken}></Updates>
@@ -195,7 +196,7 @@
           {shortcutData}
           {authToken}
           {editData}
-          on:switch={() => scanD = false}
+          on:switch={() => (scanD = false)}
           on:closeShortCut={() => (scanD = false)}
         ></ShortcutWrapper>
       {/if}

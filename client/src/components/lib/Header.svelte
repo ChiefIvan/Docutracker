@@ -214,7 +214,6 @@
         class:dark={$dark}
       >
         {$userData.institute}
-
         {$userData.unit}
       </p>
     </div>
@@ -385,6 +384,16 @@
       }
 
       & p.name-wrapper.dark {
+        color: var(--background);
+      }
+
+      & p.status-wrapper {
+        margin-bottom: 0.5rem;
+        font-size: 1orem;
+        color: var(--main-col-3);
+      }
+
+      & p.status-wrapper.dark {
         color: var(--background);
       }
     }

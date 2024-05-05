@@ -105,6 +105,7 @@
 
     let editData = {
       documentName: "",
+      documentProgram: "",
       codeData: "",
       documentDes: "",
       isEdit: false,
@@ -121,6 +122,7 @@
 
   let documentDesSelected = "";
   let documentCodeSelected = "";
+  let documentProgramSelected = "";
 
   const handleDocumentEdit = (documentName: string, documentID: string) => {
     for (let document of $documents) {
@@ -130,11 +132,13 @@
       ) {
         documentCodeSelected = document.codeData;
         documentDesSelected = document.documentDescription;
+        documentProgramSelected = document.documentProgram;
       }
     }
 
     let editData = {
       documentName: documentName,
+      documentProgram: documentProgramSelected,
       codeData: documentCodeSelected,
       documentDes: documentDesSelected,
       isEdit: true,
@@ -266,8 +270,9 @@
                         Status: Waiting for the recipient
                       </h3>
                       <span class:dark={$dark}
-                        >Your document is finished and is waiting for you to claim from {pathValue.name}.
-                        Please get your document immediately!</span
+                        >Your document is finished and is waiting for you to
+                        claim from {pathValue.name}. Please get your document
+                        immediately!</span
                       >
                     </div>
                   </div>

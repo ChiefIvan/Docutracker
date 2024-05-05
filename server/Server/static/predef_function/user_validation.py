@@ -8,9 +8,9 @@ class EntryValidator:
 
     def validate(self) -> bool | dict:
 
-        length_error: str = "Your institute must be greater than 1 Character"
+        length_error: str = "The program field must be greater than 3 Character"
         error_responses: dict = {
-            "institute": "Institute Field is Empty!",
+            "institute": "Program Field is Empty!",
             "email": "Email Entry is Empty!",
             "password": "Password Entry is Empty!",
         }
@@ -25,7 +25,7 @@ class EntryValidator:
                     }
 
         if self.entries["institute"] is not None:
-            if len(self.entries["institute"]) < 2:
+            if len(self.entries["institute"]) < 3:
                 return {"error": length_error}
 
         return True

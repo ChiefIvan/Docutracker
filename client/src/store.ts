@@ -16,7 +16,7 @@ export type SignUpBind = LoginBind & {
 };
 
 export type Credentials = {
-  institute: string;
+  institute?: string;
   previlage?: string;
   email?: string;
   unit?: string;
@@ -33,6 +33,7 @@ export type Credentials = {
   codeData?: string;
   documentName?: string;
   documentDescription?: string;
+  documentProgram?: string;
   documentRegDate?: string;
   key?: string;
   full_ver_val?: boolean;
@@ -65,6 +66,8 @@ export type Route = {
 };
 
 export type Document = {
+  documentElement: any;
+  body: any;
   attemps: number;
   documentID: number;
   codeData: string;
@@ -264,6 +267,7 @@ export const notificationExpand = writable(false);
 export const navExpand = writable(true);
 export const registrationExpand = writable(false);
 export const selectExpand = writable(false);
+export const selectProgramExpand = writable(false);
 export const dark = writable(false);
 export const detailsExpand = writable(false);
 export const sortExpand = writable(false);

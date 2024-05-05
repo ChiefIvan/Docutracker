@@ -89,13 +89,13 @@
     //   location: "/notifications",
     //   bind: goToNotifications,
     // },
-    {
-      id: 2,
-      navName: "Reports",
-      comp: ReportIcon,
-      location: "/reports",
-      bind: goToReports,
-    },
+    // {
+    //   id: 2,
+    //   navName: "Reports",
+    //   comp: ReportIcon,
+    //   location: "/reports",
+    //   bind: goToReports,
+    // },
     {
       id: 3,
       navName: "History",

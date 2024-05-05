@@ -323,7 +323,7 @@
                     {document.attemps}
                   </div>
                   <div class="id" class:dark={$dark} title={document.codeData}>
-                    {document.codeData}
+                    {document.codeData.slice(0, 5)}
                   </div>
                   <div
                     class="date"
@@ -370,7 +370,7 @@
                     {document.attemps}
                   </div>
                   <div class="id" class:dark={$dark} title={document.codeData}>
-                    {document.codeData}
+                    {document.codeData.slice(0, 5)}
                   </div>
                   {#each document.documentPath as path, i (i)}
                     <div
@@ -419,7 +419,7 @@
                     {document.attemps}
                   </div>
                   <div class="id" class:dark={$dark} title={document.codeData}>
-                    {document.codeData}
+                    {document.codeData.slice(0, 5)}
                   </div>
                 </div>
               {/each}
@@ -459,7 +459,7 @@
                     {document.attemps}
                   </div>
                   <div class="id" class:dark={$dark} title={document.codeData}>
-                    {document.codeData}
+                    {document.codeData.slice(0, 5)}
                   </div>
                 </div>
               {/each}
@@ -499,7 +499,7 @@
                     {document.attemps}
                   </div>
                   <div class="id" class:dark={$dark} title={document.codeData}>
-                    {document.codeData}
+                    {document.codeData.slice(0, 5)}
                   </div>
                 </div>
               {/each}

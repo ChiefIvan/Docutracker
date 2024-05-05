@@ -7,7 +7,6 @@
     handleFetch,
     showMessage,
     filterName,
-    location,
     userData,
     type RequestAPI,
     type ResponseData,

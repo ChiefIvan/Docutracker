@@ -10,11 +10,11 @@ document_routes = db.Table('document_routes',
                            )
 
 document_notifications = db.Table('document_notifications',
-                           db.Column('document_id', db.Integer,
-                                     db.ForeignKey('documents.id')),
-                           db.Column('notification_id', db.Integer,
-                                     db.ForeignKey('notification.id'))
-                           )
+                                  db.Column('document_id', db.Integer,
+                                            db.ForeignKey('documents.id')),
+                                  db.Column('notification_id', db.Integer,
+                                            db.ForeignKey('notification.id'))
+                                  )
 
 
 class User(db.Model):
@@ -45,8 +45,9 @@ class Documents(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     code = db.Column(db.String(500), nullable=True)
+    program = db.Column(db.String(10), nullable=True)
     description = db.Column(db.String(1000), nullable=True)
-    attemp = db.Column(db.Integer, nullable=True ,default=0)
+    attemp = db.Column(db.Integer, nullable=True, default=0)
     pending = db.Column(db.Boolean, default=True)
     pending_date = db.Column(db.DateTime(), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
@@ -62,6 +63,7 @@ class Notification(db.Model):
     body = db.Column(db.String(50), nullable=False)
     date = db.Column(db.DateTime(), nullable=False)
     document_id = db.Column(db.Integer, db.ForeignKey("documents.id"))
+
 
 class Route(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { documents, type Route, type Document } from "../../store";
+  import { documents, dark, type Document } from "../../store";
   import { onMount } from "svelte";
 
   import moment from "moment";
@@ -10,11 +10,11 @@
   let count = 0;
   let range: number[] = [];
 
-  let hours = [4, 2, 7, 6, 10];
-  let maxV = Math.max(...hours);
+  // let hours = [4, 2, 7, 6, 10, 20];
+  // let maxV = Math.max(...hours);
   // let percentages = hours.map((value) => (value / maxV) * 100);
 
-  while (maxV > range.length) {
+  while (24 > range.length) {
     range = [count, ...range];
     count++;
   }
@@ -102,11 +102,13 @@
         let duration = moment.duration(confirmedDate.diff(approvedDate));
         let hours = parseFloat(duration.asHours().toFixed(2));
 
+        console.log(hours);
+
         return {
           routeName: route.name,
           approvedDate: route.approvedDate,
           confirmedDate: route.confirmedDate,
-          durationInHours: hours === 0 ? 1 : hours,
+          durationInHours: hours,
           hours: duration.hours(),
           minutes: duration.minutes(),
           seconds: duration.seconds(),
@@ -125,20 +127,24 @@
 
 <main>
   {#if timeData.length}
-    <h1>
+    <h1 class:dark={$dark}>
       {docN}
     </h1>
     <div class="wrapper">
       <div class="content-wrapper">
         <div class="lines-wrapper">
           {#each range as n}
-            <div class="lines">{n}</div>
+            <div class="lines" class:dark={$dark}>{n}</div>
           {/each}
         </div>
-        <div class="bar-wrapper">
+        <div class="bar-wrapper" class:dark={$dark}>
           {#each timeData as value, index (index)}
-            <div class="bars" style={`height: ${value.durationInHours}%;`}>
-              <div class="bar-name">
+            <div
+              class="bars"
+              class:dark={$dark}
+              style={`height: ${value.durationInHours}%;`}
+            >
+              <div class="bar-name" class:dark={$dark}>
                 {value.routeName}
               </div>
             </div>
@@ -147,21 +153,21 @@
       </div>
       <div class="summary-wrapper">
         <div>
-          <h2>Route</h2>
+          <h2 class:dark={$dark}>Route</h2>
           <ul class="time-wrapper">
             {#each timeData as value, index (index)}
               {#if value.hours && value.minutes}
-                <li>
+                <li class:dark={$dark}>
                   ✅ {value.routeName} took {value.hours} hours and {value.minutes}
                   minutes to confirm.
                 </li>
               {:else if !value.hours && value.minutes && value.seconds}
-                <li>
+                <li class:dark={$dark}>
                   ✅ {value.routeName} took {value.minutes} minutes and {value.seconds}
                   seconds to confirm.
                 </li>
               {:else if !value.hours && !value.minutes && value.seconds}
-                <li>
+                <li class:dark={$dark}>
                   ✅ {value.routeName} took {value.seconds} seconds to confirm.
                 </li>
               {/if}
@@ -169,8 +175,8 @@
           </ul>
         </div>
         <div>
-          <h2>Time</h2>
-          <p>
+          <h2 class:dark={$dark}>Time</h2>
+          <p class:dark={$dark}>
             {#if selectedDocument && selectedDocument.documentPath && selectedDocument.documentPath.length}
               {@const firstRouteApprovedTime = moment(
                 selectedDocument.documentPath[0].approvedDate,
@@ -203,9 +209,9 @@
         <!-- <div>
           <h2>Summary</h2>
           <p> -->
-            <!-- This section keeps track of the time taken by each route for the
+        <!-- This section keeps track of the time taken by each route for the
           specific document you’ve chosen. -->
-            <!-- Lorem ipsum dolor sit, amet consectetur adipisicing elit. Dolor officiis
+        <!-- Lorem ipsum dolor sit, amet consectetur adipisicing elit. Dolor officiis
             quisquam omnis? Assumenda ab reprehenderit labore distinctio similique
             modi odit numquam laborum nobis velit doloribus voluptatum dolores, mollitia,
             rerum voluptate at suscipit quaerat nostrum. Minima!
@@ -232,6 +238,11 @@
       font-weight: bold;
       margin: 2rem 0;
       color: var(--scroll-color);
+      transition: all ease-in-out 300ms;
+    }
+
+    & h1.dark {
+      color: var(--background);
     }
 
     & div.wrapper {
@@ -247,7 +258,7 @@
           display: flex;
           flex-direction: column;
           width: 42rem;
-          height: 30rem;
+          height: 34.4rem;
           position: absolute;
           left: -2rem;
           padding: 0.5rem;
@@ -255,16 +266,22 @@
           bottom: 0;
 
           & div.lines {
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             flex: 1;
             display: flex;
             align-items: center;
             color: var(--scroll-color);
+            transition: all ease-in-out 300ms;
+          }
+
+          & div.lines.dark {
+            border-color: var(--dark-main-col-6);
+            color: var(--main-col-2);
           }
         }
 
         & div.bar-wrapper {
-          height: 30rem;
+          height: 35rem;
           width: 40rem;
           display: flex;
           column-gap: 0.5rem;
@@ -277,14 +294,28 @@
             flex: 1;
             background-color: var(--header-color);
             position: relative;
+            transition: all ease-in-out 300ms;
 
             & div.bar-name {
+              transition: all ease-in-out 300ms;
               position: absolute;
               text-align: center;
               width: 100%;
               bottom: -2.5rem;
             }
+
+            & div.bar-name.dark {
+              color: var(--main-col-2);
+            }
           }
+
+          & div.bars.dark {
+            background-color: var(--background);
+          }
+        }
+
+        & div.bar-wrapper.dark {
+          border-color: var(--input-color);
         }
       }
 
@@ -299,12 +330,30 @@
           & h2 {
             font-size: 1rem;
             font-weight: bold;
+            transition: all ease-in-out 300ms;
             color: var(--scroll-color);
+          }
+
+          & h2.dark {
+            color: var(--background);
+          }
+
+          & p {
+            transition: all ease-in-out 300ms;
+          }
+
+          & p.dark {
+            color: var(--main-col-2);
           }
 
           & ul.time-wrapper {
             & li {
               display: inline-block;
+              transition: all ease-in-out 300ms;
+            }
+
+            & li.dark {
+              color: var(--main-col-2);
             }
           }
         }
