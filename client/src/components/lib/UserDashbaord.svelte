@@ -81,7 +81,9 @@
         let eventTime = moment(appDate, "ddd, DD MMM YYYY HH:mm:ss z");
 
         if (currentTime.isAfter(eventTime)) {
-          let duration = moment.duration(currentTime.diff(eventTime));
+          let duration = moment.duration(
+            currentTime.subtract(8, "hours").diff(eventTime)
+          );
 
           days = duration.days();
           hours = duration.hours();
@@ -106,6 +108,7 @@
     let editData = {
       documentName: "",
       documentProgram: "",
+      documentInstitute: "",
       codeData: "",
       documentDes: "",
       isEdit: false,
@@ -123,6 +126,7 @@
   let documentDesSelected = "";
   let documentCodeSelected = "";
   let documentProgramSelected = "";
+  let documentInstituteSelected = "";
 
   const handleDocumentEdit = (documentName: string, documentID: string) => {
     for (let document of $documents) {
@@ -132,6 +136,7 @@
       ) {
         documentCodeSelected = document.codeData;
         documentDesSelected = document.documentDescription;
+        documentInstituteSelected = document.documentInstitute;
         documentProgramSelected = document.documentProgram;
       }
     }
@@ -139,6 +144,7 @@
     let editData = {
       documentName: documentName,
       documentProgram: documentProgramSelected,
+      documentInstitute: documentInstituteSelected,
       codeData: documentCodeSelected,
       documentDes: documentDesSelected,
       isEdit: true,

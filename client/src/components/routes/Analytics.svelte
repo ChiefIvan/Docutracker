@@ -102,8 +102,6 @@
         let duration = moment.duration(confirmedDate.diff(approvedDate));
         let hours = parseFloat(duration.asHours().toFixed(2));
 
-        console.log(hours);
-
         return {
           routeName: route.name,
           approvedDate: route.approvedDate,
@@ -175,36 +173,42 @@
           </ul>
         </div>
         <div>
-          <h2 class:dark={$dark}>Time</h2>
-          <p class:dark={$dark}>
-            {#if selectedDocument && selectedDocument.documentPath && selectedDocument.documentPath.length}
-              {@const firstRouteApprovedTime = moment(
-                selectedDocument.documentPath[0].approvedDate,
-                "ddd, DD MMM YYYY HH:mm:ss z"
-              )}
-              {@const lastRouteApprovedTime = moment(
-                selectedDocument.documentPath[
-                  selectedDocument.documentPath.length - 1
-                ].completeDate,
-                "ddd, DD MMM YYYY HH:mm:ss z"
-              )}
-              {@const totalTime = moment.duration(
-                lastRouteApprovedTime.diff(firstRouteApprovedTime)
-              )}
-              {#if totalTime.hours() && totalTime.minutes()}
+          {#if selectedDocument && selectedDocument.documentPath && selectedDocument.documentPath.length}
+            {@const firstRouteApprovedTime = moment(
+              selectedDocument.documentPath[0].approvedDate,
+              "ddd, DD MMM YYYY HH:mm:ss z"
+            )}
+            {@const lastRouteApprovedTime = moment(
+              selectedDocument.documentPath[
+                selectedDocument.documentPath.length - 1
+              ].completeDate,
+              "ddd, DD MMM YYYY HH:mm:ss z"
+            )}
+            {@const totalTime = moment.duration(
+              lastRouteApprovedTime.diff(firstRouteApprovedTime)
+            )}
+            {#if totalTime.hours() && totalTime.minutes()}
+              <h2 class:dark={$dark}>Time</h2>
+              <p class:dark={$dark}>
                 {docN} got a total transaction time of {totalTime.hours()} hours
                 and
                 {totalTime.minutes()} minutes
-              {:else if !totalTime.hours() && totalTime.minutes() && totalTime.seconds()}
+              </p>
+            {:else if !totalTime.hours() && totalTime.minutes() && totalTime.seconds()}
+              <h2 class:dark={$dark}>Time</h2>
+              <p class:dark={$dark}>
                 {docN} got a total transaction time of {totalTime.minutes()} minutes
                 and {totalTime.seconds()} seconds
-              {:else if !totalTime.hours() && !totalTime.minutes() && totalTime.seconds()}
+              </p>
+            {:else if !totalTime.hours() && !totalTime.minutes() && totalTime.seconds()}
+              <h2 class:dark={$dark}>Time</h2>
+              <p class:dark={$dark}>
                 {docN} got a total transaction time of {totalTime.seconds()} seconds.
-              {/if}
-            {:else}
-              This document hasn't been approved yet!
+              </p>
             {/if}
-          </p>
+          {:else}
+            This document hasn't been approved yet!
+          {/if}
         </div>
         <!-- <div>
           <h2>Summary</h2>
@@ -220,7 +224,7 @@
       </div>
     </div>
   {:else}
-    <h1>
+    <h1 class:dark={$dark} class:not={!docN && !docN.length}>
       {docN && docN.length
         ? `${docN} hasn't been confirmed yet!`
         : "Please select a document first"}
@@ -234,11 +238,16 @@
     max-width: 1000px;
 
     & h1 {
-      font-size: 2rem;
+      font-size: 3rem;
       font-weight: bold;
       margin: 2rem 0;
       color: var(--scroll-color);
       transition: all ease-in-out 300ms;
+    }
+
+    & h1.not {
+      text-align: center;
+      line-height: 75vh;
     }
 
     & h1.dark {

@@ -6,6 +6,7 @@
     showMessage,
     selectExpand,
     selectProgramExpand,
+    selectInstituteExpand,
     modeExpand,
     userData,
     documents,
@@ -74,15 +75,23 @@
   let documentDescription = "";
   let programSelected = "";
   let documentSelected = "";
+  let instituteSelected = "";
   let edit = false;
 
   onMount(() => {
     if (editData && Object.keys(editData).length !== 0) {
-      const { documentName, documentProgram, codeData, documentDes, isEdit } =
-        editData;
+      const {
+        documentName,
+        documentProgram,
+        codeData,
+        documentDes,
+        isEdit,
+        documentInstitute,
+      } = editData;
 
       documentSelected = documentName;
       programSelected = documentProgram;
+      instituteSelected = documentInstitute;
       documentDescription = documentDes;
       value = codeData;
       edit = isEdit;
@@ -98,6 +107,7 @@
       codeData: "",
       documentName: "",
       documentProgram: "",
+      documentInstitute: "",
       documentDescription: "",
       edit: false,
     },
@@ -106,12 +116,18 @@
   const handleSubmit = async () => {
     registrationRequest.credentials!.codeData = value;
     registrationRequest.credentials!.documentName = documentSelected;
+    registrationRequest.credentials!.documentInstitute = instituteSelected;
     registrationRequest.credentials!.documentProgram = programSelected;
     registrationRequest.credentials!.documentDescription = documentDescription;
     registrationRequest.credentials!.edit = edit;
 
     if (!documentSelected.length) {
       $showMessage = { error: "Please Select a Document first!" };
+      return;
+    }
+
+    if (!instituteSelected.length) {
+      $showMessage = { error: "Please Select a Program Institue first!" };
       return;
     }
 
@@ -167,14 +183,16 @@
           codeData: value,
           attemps: 0,
           documentName: documentSelected,
-          documentProgram: programSelected,
           documentDescription: documentDescription,
           pendingDate: date.toISOString(),
           documentPath: [],
         },
       ]);
+
       (document.activeElement as HTMLElement).blur();
       documentSelected = "";
+      instituteSelected = "";
+      programSelected = "";
       documentDescription = "";
       value = "";
     }
@@ -182,6 +200,11 @@
 
   const handleExpand = () => {
     $selectExpand = !$selectExpand;
+    $modeExpand = false;
+  };
+
+  const handleInstituteExpand = () => {
+    $selectInstituteExpand = !$selectInstituteExpand;
     $modeExpand = false;
   };
 
@@ -217,24 +240,14 @@
     // },
   ];
 
-  const programSelection = [
-    {
-      id: 1,
-      name: "BSMATH",
-    },
-    {
-      id: 2,
-      name: "BSCE",
-    },
-    {
-      id: 3,
-      name: "BITM",
-    },
-    {
-      id: 4,
-      name: "BSIT",
-    },
-  ];
+  const instituteSelection = ["FALS", "FCDSET", "FGBM", "FNAHS", "FTED"];
+  const programSelection = {
+    FALS: ["BSB", "BSA", "BSES", "BSAM", "BSDC"],
+    FCDSET: ["BSCE", "BSM", "BITM", "BSIT"],
+    FGBM: ["BSC", "BSBA", "BSHM"],
+    FNAHS: ["BSN"],
+    FTED: ["BEE", "BECE", "BSNE", "BTLE"],
+  };
 </script>
 
 <div class="register-document-wrapper">
@@ -257,22 +270,7 @@
           <div class="selected" class:dark={$dark}>
             <p class:dark={$dark}>
               {#if documentSelected.length !== 0}
-                {documentSelected}:
-                {#if documentSelected === "Faculty Loading"}
-                  Program Head -> Dean Office -> Academic VP
-                {:else if documentSelected === "Requested Subject"}
-                  Program Head -> Dean Office -> Academic VP
-                {:else if documentSelected === "Endorsement Form"}
-                  Program Head -> Dean Office -> Academic VP -> OP
-                {:else if documentSelected === "Application for Leave"}
-                  {#if $userData.unit === "Program Head"}
-                    Dean Office / HROS / VPAA
-                  {:else if $userData.unit === "Dean Office"}
-                    HROS / VPAA
-                  {:else}
-                    Program Head / HROS / VPAA
-                  {/if}
-                {/if}
+                {documentSelected}
               {:else}
                 Please select a document
               {/if}
@@ -298,24 +296,90 @@
               </li>
             {/each}
           </Dropdown>
+          {#if documentSelected === "Faculty Loading"}
+            <p class="routes" class:dark={$dark}>
+              Route: Program Head / Dean Office / Academic VP
+            </p>
+          {:else if documentSelected === "Requested Subject"}
+            <p class="routes" class:dark={$dark}>
+              Route: Program Head / Dean Office / Academic VP
+            </p>
+          {:else if documentSelected === "Endorsement Form"}
+            <p class="routes" class:dark={$dark}>
+              Route: Program Head / Dean Office / Academic VP / OP
+            </p>
+          {/if}
         </div>
-        {#if documentSelected.length !== 0}
+        {#if documentSelected && documentSelected.length !== 0}
+          <div
+            class="selected-wrapper"
+            on:click|stopPropagation={handleInstituteExpand}
+            transition:fade
+          >
+            <div
+              class="selected"
+              use:tooltip={{
+                content:
+                  "The first route of this document is Program Head, you must select what institute of the Program Head that recieves this document",
+                animation: "perspective-subtle",
+                theme: "tooltip",
+                offset: [0, 0],
+                placement: "bottom",
+              }}
+              class:dark={$dark}
+            >
+              <p class:dark={$dark}>
+                {#if instituteSelected && instituteSelected.length !== 0}
+                  {instituteSelected}
+                {:else}
+                  Please select an Institute
+                {/if}
+              </p>
+              <TriangleIcon rotate={$selectInstituteExpand}></TriangleIcon>
+            </div>
+            <Dropdown expand={$selectInstituteExpand} docs={true}>
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
+              <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+              {#each instituteSelection as value, i (i)}
+                <li
+                  class="list-wrapper"
+                  class:active={value === instituteSelected}
+                  class:dark={$dark}
+                  on:click={() => {
+                    instituteSelected = value;
+                    programSelected = "";
+                  }}
+                >
+                  <span
+                    class="document-name"
+                    class:dark={$dark}
+                    class:active={value === instituteSelected}>{value}</span
+                  >
+                </li>
+              {/each}
+            </Dropdown>
+          </div>
+        {/if}
+        {#if instituteSelected && instituteSelected.length !== 0}
           <div
             class="selected-wrapper"
             on:click|stopPropagation={handleProgramExpand}
             transition:fade
-            use:tooltip={{
-              content:
-                "The first route of this document is Program Head, you must select what program of the Program Head that recieves this document",
-              animation: "perspective-subtle",
-              theme: "tooltip",
-              offset: [0, 0],
-              placement: "bottom",
-            }}
           >
-            <div class="selected" class:dark={$dark}>
+            <div
+              class="selected"
+              use:tooltip={{
+                content:
+                  "You must also select what program of the Program Head that recieves this document",
+                animation: "perspective-subtle",
+                theme: "tooltip",
+                offset: [0, 0],
+                placement: "bottom",
+              }}
+              class:dark={$dark}
+            >
               <p class:dark={$dark}>
-                {#if programSelected.length !== 0}
+                {#if programSelected && programSelected.length !== 0}
                   {programSelected}
                 {:else}
                   Please select a Program
@@ -326,18 +390,17 @@
             <Dropdown expand={$selectProgramExpand} docs={true}>
               <!-- svelte-ignore a11y-click-events-have-key-events -->
               <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-              {#each programSelection as value (value.id)}
+              {#each programSelection[instituteSelected] as value, i (i)}
                 <li
                   class="list-wrapper"
-                  class:active={value.name === programSelected}
+                  class:active={value === programSelected}
                   class:dark={$dark}
-                  on:click={() => (programSelected = value.name)}
+                  on:click={() => (programSelected = value)}
                 >
                   <span
                     class="document-name"
                     class:dark={$dark}
-                    class:active={value.name === programSelected}
-                    >{value.name}</span
+                    class:active={value === programSelected}>{value}</span
                   >
                 </li>
               {/each}
@@ -490,7 +553,18 @@
 
           & div.selected-wrapper {
             position: relative;
+            margin: 1rem 0;
             flex: 1;
+
+            & p.routes {
+              padding: 0 0.5rem;
+              transition: all ease-in-out 500ms;
+              color: var(--input-color);
+            }
+
+            & p.routes.dark {
+              color: var(--header-color);
+            }
 
             & div.selected {
               transition: all ease-in-out 300ms;
@@ -498,7 +572,6 @@
               padding: 0.5rem;
               border-radius: 0.5rem;
               color: var(--scroll-color);
-              margin: 1rem 0;
               display: flex;
               justify-content: space-between;
               align-items: center;
@@ -576,7 +649,7 @@
           border-radius: 0.5rem;
           padding: 0.5rem;
           width: 100%;
-          height: 77%;
+          height: 74%;
           min-width: 20%;
           min-height: 20%;
           border: 1px solid var(--header-color);

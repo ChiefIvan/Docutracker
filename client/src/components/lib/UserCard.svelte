@@ -1,14 +1,17 @@
 <script lang="ts">
   import {
     dark,
-    handleDetails,
-    activeTab,
     filterName,
+    searchUser,
+    documentSelected,
     type Users,
-    type Document,
   } from "../../store";
   import { tooltip } from "../shared/Tooltip";
-  import { onMount } from "svelte";
+  import { onDestroy } from "svelte";
+
+  onDestroy(() => {
+    $documentSelected = "";
+  });
 
   import Self from "./Self.svelte";
   import DocumentCard from "./DocumentCard.svelte";
@@ -24,6 +27,8 @@
     documentsExpand = true;
     user = selecctedUser;
   };
+
+  $: arr = searchUser(filteredArray, $documentSelected);
 </script>
 
 {#if documentsExpand}
@@ -42,19 +47,27 @@
     <!-- svelte-ignore missing-declaration -->
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
-    {#each filteredArray as user, i (i)}
-      <div class="table-body" on:click={() => handleUserDocuments(user)}>
-        <p class="value img">
-          <!-- svelte-ignore a11y-img-redundant-alt -->
-          <img src={user.userImg} alt="Author Image" />
-          <span class="wrapper">{user.fullName}</span>
-        </p>
-        <p class="value">{user.email}</p>
-        <p class="value">{user.institute}</p>
-        <p class="value">{user.designation}</p>
-      </div>
-      <!-- LeftOver Goes Here -->
-    {/each}
+    {#if arr.length}
+      {#each arr as user, i (i)}
+        <div
+          class="table-body"
+          class:dark={$dark}
+          on:click={() => handleUserDocuments(user)}
+        >
+          <p class="value img" class:dark={$dark}>
+            <!-- svelte-ignore a11y-img-redundant-alt -->
+            <img src={user.userImg} alt="Author Image" />
+            <span class="wrapper">{user.fullName}</span>
+          </p>
+          <p class="value" class:dark={$dark}>{user.email}</p>
+          <p class="value" class:dark={$dark}>{user.institute}</p>
+          <p class="value" class:dark={$dark}>{user.designation}</p>
+        </div>
+        <!-- LeftOver Goes Here -->
+      {/each}
+    {:else}
+      <h1 class:dark={$dark}>No Users Found</h1>
+    {/if}
   </div>
 {:else}
   <Self {route} {filteredArray}></Self>
@@ -62,6 +75,19 @@
 
 <style>
   div.table {
+    & h1 {
+      transition: all ease-in-out 300ms;
+      color: var(--input-color);
+      line-height: 75vh;
+      text-align: center;
+      font-weight: bold;
+      font-size: 3rem;
+    }
+
+    & h1.dark {
+      color: var(--background);
+    }
+
     & div.table-head {
       display: flex;
       transition: hover ease-in-out 500ms;
@@ -113,6 +139,10 @@
           border-radius: 50%;
         }
       }
+
+      & p.value.dark {
+        color: var(--header-color);
+      }
     }
 
     & div.table-body:hover {
@@ -121,6 +151,18 @@
 
     & div.table-body:nth-child(odd) {
       background-color: var(--main-col-5);
+    }
+
+    & div.table-body.dark:hover {
+      background-color: var(--dark-main-col-6);
+    }
+
+    & div.table-body.dark:nth-child(odd) {
+      background-color: var(--main-col-5);
+    }
+
+    & div.table-head.dark {
+      border-color: var(--input-color);
     }
 
     & div.user-wrapper {

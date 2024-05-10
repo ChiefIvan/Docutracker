@@ -149,7 +149,7 @@
   let unitVerified = true;
   let passwordVerified = true;
   let cnfrmPasswordVerified = true;
-  let othersRev = false;
+  let programVerified = true;
 
   let emailPattern = new RegExp(
     "^[a-zA-Z0-9._%+-]{5,}@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
@@ -166,7 +166,16 @@
     unit: "",
     password: "",
     cnfrmPassword: "",
+    program: "",
     captVerification: false,
+  };
+
+  let programInInstitute = {
+    FALS: ["BSB", "BSA", "BSES", "BSAM", "BSDC"],
+    FCDSET: ["BSCE", "BSM", "BITM", "BSIT"],
+    FGBM: ["BSC", "BSBA", "BSHM"],
+    FNAHS: ["BSN"],
+    FTED: ["BEE", "BECE", "BSNE", "BTLE"],
   };
 
   $: newUser.fullName && newUser.fullName.length && newUser.fullName.length < 8
@@ -177,13 +186,28 @@
     ? (emailVerified = false)
     : (emailVerified = true);
 
+  $: newUser.institute &&
+  newUser.institute.length &&
+  newUser.program &&
+  newUser.program.length &&
+  !programInInstitute[newUser.institute].includes(newUser.program.toUpperCase())
+    ? (programVerified = false)
+    : (programVerified = true);
+
+  $: newUser.unit &&
+  newUser.unit.length &&
+  newUser.unit === "Program Head" &&
+  !newUser.institute
+    ? (instituteVerified = false)
+    : (instituteVerified = true);
+
   $: newUser.employeeID &&
   newUser.employeeID.length &&
   !employeeIDPattern.test(newUser.employeeID)
     ? (employeeIDVerified = false)
     : (employeeIDVerified = true);
 
-  $: newUser.unit && newUser.unit.length && newUser.unit.length < 4
+  $: newUser.unit && newUser.unit.length && newUser.unit.length < 2
     ? (unitVerified = false)
     : (unitVerified = true);
 
@@ -211,8 +235,6 @@
     newUser.employeeID.length &&
     newUser.unit &&
     newUser.unit.length &&
-    newUser.institute &&
-    newUser.institute.length &&
     newUser.password &&
     newUser.password.length &&
     newUser.cnfrmPassword &&
@@ -228,6 +250,16 @@
       cnfrmPasswordVerified;
   }
 
+  $: console.log(
+    fullNameVerified,
+    instituteVerified,
+    emailVerified,
+    employeeIDVerified,
+    unitVerified,
+    passwordVerified,
+    cnfrmPasswordVerified
+  );
+
   let inputBinds: SignUpBind = {
     fullNameInput: false,
     emailInput: false,
@@ -235,7 +267,7 @@
     unitInput: false,
     passwordInput: false,
     cnfrmPasswordInput: false,
-    otherInput: false,
+    programInput: false,
   };
 
   const handleInput = (event: Event) => {
@@ -261,10 +293,6 @@
     if (id === "Confirm Password") {
       newUser.cnfrmPassword = target.value;
     }
-
-    if (id === "N/A if None") {
-      newUser.institute = target.value;
-    }
   };
 
   const signUpAddress = `${address}/signup`;
@@ -277,38 +305,43 @@
     credentials: newUser,
   };
 
-  const programs = ["BSMATH", "BSCE", "BITM", "BSIT"];
   const unitsRequiringNotApplicable = ["Academic VP", "Dean Office", "OP"];
 
   const handleSubmit = async () => {
     if (!croppedImage || (croppedImage && !croppedImage.length)) {
-      $showMessage = { error: "Please Select an Image for your Profile!" };
+      $showMessage = { error: "Please select an image for your profile!" };
+      return;
+    }
+
+    if (!newUser.unit.length) {
+      $showMessage = { error: "Please select a proper designation/office!" };
+      return;
+    }
+
+    if (newUser.unit === "Program Head" && !newUser.institute.length) {
+      $showMessage = { error: "Please select a proper institute!" };
+      return;
+    }
+
+    if (newUser.institute.length && !newUser.program.length) {
+      $showMessage = { error: "Please select a proper institute!" };
       return;
     }
 
     if (
-      newUser.unit === "Program Head" &&
-      !programs.includes(newUser.institute)
+      newUser.institute &&
+      newUser.program &&
+      !programInInstitute[newUser.institute].includes(
+        newUser.program.toUpperCase()
+      )
     ) {
-      console.log(newUser);
-      $showMessage = {
-        error: "If you're a Program Head, please Select a proper Program",
-      };
-      return;
-    }
-
-    if (
-      unitsRequiringNotApplicable.includes(newUser.unit) &&
-      programs.includes(newUser.institute)
-    ) {
-      $showMessage = {
-        error: "If you're not a Program Head, please Select Not Applicable",
-      };
+      $showMessage = { error: "Please select a proper program!" };
       return;
     }
 
     newUser.captVerification = checkValue;
     newUser.userImg = base64String;
+
     signUpRequest.credentials = newUser;
 
     isRequest = true;
@@ -334,6 +367,7 @@
           unit: "",
           password: "",
           cnfrmPassword: "",
+          program: "",
           captVerification: false,
         };
 
@@ -344,10 +378,8 @@
           unitInput: false,
           passwordInput: false,
           cnfrmPasswordInput: false,
-          otherInput: false,
+          programInput: false,
         };
-
-        othersRev = false;
 
         navigate("/auth/login");
         timeOutID = setTimeout(() => {
@@ -416,8 +448,6 @@
     attemps = 3;
     captchaImage = "";
   };
-
-  $: console.log(newUser.institute);
 </script>
 
 <svelte:head>
@@ -489,7 +519,7 @@
       bind:files={fileData}
       on:change={handleImage}
       type="file"
-      accept=".jpg, .jpeg, .png"
+      accept=".jpg"
     />
     <Input
       inputType="email"
@@ -560,62 +590,67 @@
 
     <div class="main-select-wrapper">
       <div class="select-wrapper">
-        <label for="institute-select" class="select-title" class:dark={$dark}
+        <label for="office-select" class="select-title" class:dark={$dark}
           >Designation/Office</label
         >
         <select
           class="institutes"
           on:change={(event) => {
+            newUser.institute = "";
+            newUser.program = "";
             newUser.unit = event?.target.value;
           }}
           name="institutes"
-          id="institute-select"
+          id="office-select"
         >
           <option value="">Select an Option</option>
           <option value="Program Head">Program Head</option>
           <option value="Dean Office">Dean Office</option>
           <option value="Academic VP">Academic VP</option>
-          <!-- <option value="Secretary">Secretary</option> -->
           <option value="OP">OP</option>
-
-          <!-- <option value="HROS">HROS</option> -->
-          <!-- <option value="VPAA">VPAA</option> -->
+          <option value="Secretary">Secretary</option>
         </select>
       </div>
-
-      <div class="select-wrapper">
-        <label for="programs-select" class="select-title" class:dark={$dark}
-          >Program</label
-        >
-        <select
-          class="institutes"
-          on:change={(event) => {
-            newUser.institute = event?.target.value;
-          }}
-          name="programs"
-          id="programs-select"
-        >
-          <option value="">Select an Option</option>
-          <option value="BSMATH">BSMATH</option>
-          <option value="BSCE">BSCE</option>
-          <option value="BITM">BITM</option>
-          <option value="BSIT">BSIT</option>
-          <option value="others">Not Applicable</option>
-        </select>
-        <!-- {#if othersRev}
-          <div class="others-wrapper">
-            <Input
-              inputType="text"
-              inputName="N/A if None"
-              verifiedEntry={instituteVerified}
-              on:input={handleInput}
-              bind:focusedInput={inputBinds.otherInput}
-              dark={$dark}
-              overlap={true}
-            />
-          </div>
-        {/if} -->
-      </div>
+      {#if newUser.unit === "Program Head"}
+        <div class="select-wrapper">
+          <label for="institute-select" class="select-title" class:dark={$dark}
+            >Institute</label
+          >
+          <select
+            class="institutes"
+            on:change={(event) => {
+              newUser.institute = event?.target.value;
+            }}
+            name="programs"
+            id="institute-select"
+          >
+            <option value="">Select an Option</option>
+            <option value="FALS">FALS</option>
+            <option value="FCDSET">FCDSET</option>
+            <option value="FGBM">FGBM</option>
+            <option value="FNAHS">FNAHS</option>
+            <option value="FTED">FTED</option>
+          </select>
+          {#if newUser.institute && newUser.institute.length}
+            <div class="others-wrapper">
+              <Input
+                inputType="text"
+                inputName="Program"
+                verifiedEntry={programVerified}
+                tooltipContent={`There's no ${newUser.program} program in ${newUser.institute} institute!`}
+                on:input={handleInput}
+                bind:focusedInput={inputBinds.programInput}
+                dark={$dark}
+                overlap={true}
+                on:input={(e) => (newUser.program = e.target.value)}
+              />
+              <p style="font-size: 0.6rem; color: crimson">
+                (Note: Please use Acronyms, e.g: "BSIT")
+              </p>
+            </div>
+          {/if}
+        </div>
+      {/if}
     </div>
 
     <div class="section-container">
@@ -717,7 +752,7 @@
         column-gap: 1rem;
 
         & div.select-wrapper {
-          width: 50%;
+          width: 100%;
           margin-top: 1rem;
           display: flex;
           justify-content: center;

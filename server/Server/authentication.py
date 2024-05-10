@@ -19,8 +19,8 @@ from .static.predef_function.image_compressor import compress_image
 from .static.predef_function.server_credentials import EMAIL
 
 
-
 auth: Blueprint = Blueprint("auth", __name__)
+
 
 @auth.route("/admin_login", methods=["POST"])
 def admin_login():
@@ -38,14 +38,15 @@ def admin_login():
         return jsonify(validate)
 
     sanitize: bool | dict = Sanitizer(
-            {"key": data["key"], "email": data["email"]}).validate()
+        {"key": data["key"], "email": data["email"]}).validate()
 
     if isinstance(sanitize, dict):
         return jsonify(sanitize)
-    
-    keys = ["DOCUTRACKER", "HSGYXVEGOIV", "JUIAZXGIQKX", "PAOGFDMOWQD", "XIWONLUWEYL", "FQEWVTCEMGT"]
+
+    keys = ["DOCUTRACKER", "HSGYXVEGOIV", "JUIAZXGIQKX",
+            "PAOGFDMOWQD", "XIWONLUWEYL", "FQEWVTCEMGT"]
     if not data["key"] in keys:
-        return jsonify({"error":key_error })
+        return jsonify({"error": key_error})
 
     if data["email"] != EMAIL:
         return jsonify({"error": invalid_credential_error})
@@ -78,7 +79,7 @@ def admin_login():
     user: User | None = User.query.filter_by(email=EMAIL).first()
 
     access_token: str = create_access_token(
-            identity=user)
+        identity=user)
 
     return jsonify({"remembered": access_token})
 
@@ -159,7 +160,7 @@ def email_verification() -> dict:
             return jsonify({"success": success_response})
 
         smt: Smt | None = Smt(db=db, resend=Resend, reset=Reset, server=server, mail=mail, access="auth.confirm_email",
-                              data=email, username=user.user_name).send()
+                              data=email, username=user.full_name).send()
 
         if isinstance(smt, dict):
             return jsonify(smt)
@@ -202,14 +203,15 @@ def signup() -> dict:
                               data=user_email, username=user_credentials["fullName"]).send()
 
         if isinstance(smt, dict):
-                return jsonify(smt)
-                
+            return jsonify(smt)
+
         try:
             new_user: User = User(
                 previlage="None",
                 user_img=image,
                 full_name=user_credentials["fullName"],
                 institute=user_credentials["institute"],
+                program=user_credentials["program"],
                 email=user_email,
                 employee_id=user_credentials["employeeID"],
                 designation=user_credentials["unit"],
@@ -223,8 +225,6 @@ def signup() -> dict:
 
             db.session.add(new_user)
             db.session.commit()
-
-            
 
         except Exception:
             return jsonify({"error": insertion_error})

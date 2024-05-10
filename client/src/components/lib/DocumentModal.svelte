@@ -34,12 +34,10 @@
     },
   };
 
+  $: console.log($documentDetails.documentD.documentPath);
   const handleApproval = async (args: string) => {
     approvalRequest.credentials!.approval = args;
-    approvalRequest.credentials!.unit =
-      $documentDetails.documentD.documentPath[
-        $documentDetails.documentD.documentPath.length - 1
-      ].name;
+    approvalRequest.credentials!.unit = $userData.unit;
     approvalRequest.credentials!.codeData = $documentDetails.documentD.codeData;
     approvalRequest.credentials!.comment = commentValue;
 
@@ -269,7 +267,7 @@
       {#if $documentDetails.documentD.documentPath.length}
         {#if lastRoute.approved && !lastRoute.confirmed && !lastRoute.finished}
           {#if $filterName == "Self"}
-            {#if (lastRoute.name === "Academic VP" && $documentDetails.documentD.documentName === "Faculty Loading" && $documentDetails.documentD.documentName === "Requested Subject") || lastRoute.name === "VPAA" || lastRoute.name === "OP"}
+            {#if (lastRoute.name === "Academic VP" && $documentDetails.documentD.documentName === "Faculty Loading") || (lastRoute.name === "Academic VP" && $documentDetails.documentD.documentName === "Requested Subject") || lastRoute.name === "VPAA" || lastRoute.name === "OP"}
               <Button hoverized={true} on:click={() => handleApproval("finish")}
                 >Finish (Applicable for the last route)</Button
               >

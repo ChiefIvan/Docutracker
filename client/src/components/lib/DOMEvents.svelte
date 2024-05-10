@@ -6,6 +6,7 @@
     actionExpand,
     selectExpand,
     selectProgramExpand,
+    selectInstituteExpand,
     dark,
     sortExpand,
     filterExpand,
@@ -34,7 +35,11 @@
     }
 
     if ($selectProgramExpand) {
-      $selectProgramExpand = false
+      $selectProgramExpand = false;
+    }
+
+    if ($selectInstituteExpand) {
+      $selectInstituteExpand = false;
     }
 
     if ($sortExpand) {

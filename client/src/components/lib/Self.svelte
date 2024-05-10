@@ -12,11 +12,12 @@
   import { flip } from "svelte/animate";
 
   export let filteredArray: Users[] = [];
-  export let route: string = "";
 
   let approvedDocuments: Users[] = [];
   // let rejectedDocuments: Users[] = [];
   // let waitingDocuments: Users[] = [];
+
+  const lastRoutes = ["OP", "Academic VP"];
 
   filteredArray.map((user) => {
     const approvedDocs = user.documents.filter((document) => {
@@ -27,8 +28,16 @@
           document.documentPath[document.documentPath.length - 1].approved &&
           !document.documentPath[document.documentPath.length - 1].confirmed) ||
         (document.documentPath.length &&
-          document.documentPath[document.documentPath.length - 1].name ===
-            $userData.unit &&
+          lastRoutes.includes(
+            document.documentPath[document.documentPath.length - 1].name
+          ) &&
+          document.documentPath[document.documentPath.length - 1].confirmed &&
+          !document.documentPath[document.documentPath.length - 1].finished &&
+          !document.documentPath[document.documentPath.length - 1].complete) ||
+        (document.documentPath.length &&
+          lastRoutes.includes(
+            document.documentPath[document.documentPath.length - 1].name
+          ) &&
           document.documentPath[document.documentPath.length - 1].confirmed &&
           document.documentPath[document.documentPath.length - 1].finished &&
           !document.documentPath[document.documentPath.length - 1].complete)
@@ -220,10 +229,14 @@
 <style>
   section.content-wrapper {
     & h2.no-document {
-      line-height: 90vh;
+      line-height: 75vh;
       text-align: center;
       font-weight: bold;
       font-size: 3rem;
+    }
+
+    & h2.no-document.dark {
+      color: var(--background);
     }
 
     & div.table-wrapper {

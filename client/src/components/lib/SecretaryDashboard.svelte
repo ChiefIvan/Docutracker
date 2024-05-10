@@ -67,7 +67,8 @@
           if (!doc.documentPath.length) {
             if (
               $userData.unit === "Program Head" &&
-              $userData.institute === doc.documentProgram
+              $userData.institute === doc.documentInstitute &&
+              $userData.program === doc.documentProgram
             ) {
               if (
                 doc.documentName === "Faculty Loading" ||
@@ -182,6 +183,24 @@
               }
             }
 
+            console.log(doc.documentPath[doc.documentPath.length - 1]);
+
+            if (
+              doc.documentPath[doc.documentPath.length - 1].name ===
+                "Academic VP" &&
+              doc.documentPath[doc.documentPath.length - 1].approved &&
+              doc.documentPath[doc.documentPath.length - 1].confirmed &&
+              !doc.documentPath[doc.documentPath.length - 1].finished &&
+              !doc.documentPath[doc.documentPath.length - 1].complete
+            ) {
+              if (
+                doc.documentName === "Faculty Loading" ||
+                doc.documentName === "Requested Subject"
+              ) {
+                return true;
+              }
+            }
+
             if (
               doc.documentPath[doc.documentPath.length - 1].name ===
                 "Academic VP" &&
@@ -195,17 +214,7 @@
                 doc.documentName === "Requested Subject"
               ) {
                 return true;
-              }
-            }
-
-            if (
-              doc.documentPath[doc.documentPath.length - 1].name === "HROS" &&
-              doc.documentPath[doc.documentPath.length - 1].confirmed
-            ) {
-              if ($userData.unit === "VPAA") {
-                if (doc.documentName === "Application for Leave") {
-                  return true;
-                }
+                console.log("Hello");
               }
             }
 
@@ -240,44 +249,6 @@
             ) {
               if (doc.documentName === "Endorsement Form") {
                 return true;
-              }
-            }
-
-            if (user.unit === "Program Head") {
-              if (
-                doc.documentPath[doc.documentPath.length - 1].name ===
-                  "Dean Office" &&
-                doc.documentPath[doc.documentPath.length - 1].confirmed
-              ) {
-                if ($userData.unit === "HROS") {
-                  if (doc.documentName === "Application for leave") {
-                    return true;
-                  }
-                }
-              }
-
-              if (
-                doc.documentPath[doc.documentPath.length - 1].name === "HROS" &&
-                doc.documentPath[doc.documentPath.length - 1].confirmed
-              ) {
-                if ($userData.unit === "VPAA") {
-                  if (doc.documentName === "Application for leave") {
-                    return true;
-                  }
-                }
-              }
-            }
-
-            if (user.unit === "Dean Office") {
-              if (
-                doc.documentPath[doc.documentPath.length - 1].name === "HROS" &&
-                doc.documentPath[doc.documentPath.length - 1].confirmed
-              ) {
-                if ($userData.unit === "VPAA") {
-                  if (doc.documentName === "Application for leave") {
-                    return true;
-                  }
-                }
               }
             }
           }
@@ -458,7 +429,9 @@
     </div>
     <UserCard filteredArray={documents} {route}></UserCard>
   {:else}
-    <h1 class="empty-message">You don't have any transactions yet!</h1>
+    <h1 class="empty-message" class:dark={$dark}>
+      You don't have any transactions yet!
+    </h1>
   {/if}
 
   <!-- {#if $activeTab === "Forward"}
@@ -495,10 +468,16 @@
 
 <style>
   h1.empty-message {
-    line-height: 90vh;
+    line-height: 80vh;
     text-align: center;
     font-weight: bold;
     font-size: 3rem;
+    color: var(--input-color);
+    transition: all ease-in-out 300ms;
+  }
+
+  & h1.dark {
+    color: var(--background);
   }
 
   main {

@@ -29,6 +29,15 @@
     sortName
   );
 
+  $: allDC = allDocuments.filter((document) => {
+    if (
+      document.documentPath.length &&
+      document.documentPath[document.documentPath.length - 1].complete
+    )
+      return true;
+    return false;
+  });
+
   let left = false;
   let right = false;
   let isOpen = false;
@@ -56,7 +65,7 @@
 {/if}
 
 <main>
-  {#if $documents.length}
+  {#if allDC.length}
     <div class="documents-wrapper">
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <!-- svelte-ignore a11y-mouse-events-have-key-events -->
@@ -115,7 +124,7 @@
         <h2 class="title-status" class:dark={$dark}>Status</h2>
       </div>
       <ul class="list-wrapper">
-        {#if allDocuments.length}
+        {#if allDC.length}
           {#each allDocuments as document (document.documentID)}
             {#if document.documentPath.length}
               {@const path =
@@ -145,12 +154,14 @@
             {/if}
           {/each}
         {:else}
-          No Match
+          <h1 class:dark={$dark}>No Match</h1>
         {/if}
       </ul>
     </div>
   {:else}
-    <h2>You don't have any documents yet!</h2>
+    <h2 class="nothing" class:dark={$dark}>
+      You don't have any Completed documents yet!
+    </h2>
   {/if}
 </main>
 
@@ -163,6 +174,19 @@
     /* margin: auto;
     max-width: 1100px; */
     padding: 0 1rem;
+
+    & h2.nothing {
+      transition: all ease-in-out 300ms;
+      color: var(--input-color);
+      line-height: 75vh;
+      text-align: center;
+      font-weight: bold;
+      font-size: 3rem;
+    }
+
+    & h2.nothing.dark {
+      color: var(--background);
+    }
 
     & div.documents-wrapper {
       & div.nav {
@@ -327,6 +351,19 @@
 
         & li.dark:nth-child(even) {
           background-color: var(--dark-main-col-6);
+        }
+
+        & h1 {
+          transition: all ease-in-out 300ms;
+          color: var(--input-color);
+          line-height: 70vh;
+          text-align: center;
+          font-weight: bold;
+          font-size: 3rem;
+        }
+
+        & h1.dark {
+          color: var(--background);
         }
       }
     }

@@ -12,6 +12,7 @@
     handleFetch,
     notificationCount,
     address,
+    filterName,
     notifications,
     type RequestAPI,
   } from "../../store";
@@ -136,7 +137,11 @@
         {#if matches}
           <BurgerIcon></BurgerIcon>
         {:else if $userData.full_ver_val}
-          <DocumentAvail></DocumentAvail>
+          {#if $filterName !== "Self"}
+            <DocumentAvail></DocumentAvail>
+          {:else}
+            <div></div>
+          {/if}
         {:else}
           <div></div>
         {/if}
@@ -208,23 +213,34 @@
       >
         Hello, {$userData.fullName}!
       </p>
-      <p
+      <ul
         transition:fly={{ y: -40, duration: 400, delay: 150 }}
         class="status-wrapper"
         class:dark={$dark}
       >
-        {$userData.institute}
-        {$userData.unit}
-      </p>
+        {#if $userData.institute}
+          <li class:dark={$dark}>
+            <p>Institute</p>
+            <p>{$userData.institute}</p>
+          </li>
+        {/if}
+        {#if $userData.program}
+          <li class:dark={$dark}>
+            <p>Program</p>
+            <p>{$userData.program}</p>
+          </li>
+        {/if}
+        <li class:dark={$dark}>
+          <p>Designation/Office</p>
+          <p>{$userData.unit}</p>
+        </li>
+        <li class:dark={$dark}>
+          <p>Verification</p>
+          <p>{$userData.full_ver_val}</p>
+        </li>
+      </ul>
     </div>
     <div class="button-wrapper">
-      <h3 class:verified={$userData.full_ver_val}>
-        {#if $userData.full_ver_val}
-          Verified
-        {:else}
-          Not Verified
-        {/if}
-      </h3>
       <MediaQuery query="(max-width: 500px)" let:matches>
         {#if matches}
           <Button on:click={() => {}} critical={true}>Logout</Button>
@@ -344,7 +360,8 @@
     border-radius: 1rem;
     box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.3);
     background-color: var(--background);
-    max-width: 20rem;
+    width: 100%;
+    max-width: 25rem;
 
     & div.upper-wrapper {
       text-align: center;
@@ -355,8 +372,8 @@
       }
 
       & p.email-wrapper {
-        margin: 1rem 0;
-        padding: 0.5rem;
+        margin: 0.5rem 0;
+        padding: 0.3rem;
         border: 1px solid var(--main-col-6);
         color: var(--scroll-color);
         border-radius: 2rem;
@@ -381,20 +398,33 @@
         margin-bottom: 0.5rem;
         font-size: 1.3rem;
         color: var(--main-col-3);
+        font-weight: 600;
       }
 
       & p.name-wrapper.dark {
         color: var(--background);
       }
 
-      & p.status-wrapper {
-        margin-bottom: 0.5rem;
-        font-size: 1orem;
-        color: var(--main-col-3);
+      & ul.status-wrapper {
+        margin: 2rem 0;
+
+        & li {
+          display: flex;
+          justify-content: space-between;
+          border-bottom: 1px solid var(--main-col-2);
+
+          & p:nth-child(2) {
+            font-weight: 300;
+          }
+        }
+
+        & li.dark {
+          border-color: var(--scroll-color);
+        }
       }
 
-      & p.status-wrapper.dark {
-        color: var(--background);
+      & ul.status-wrapper.dark {
+        color: var(--main-col-2);
       }
     }
 

@@ -26,6 +26,7 @@
     "html5-qrcode": "^2.3.8",
     "jsqr": "^1.4.0",
     "moment": "^2.29.4",
+    "pdfmake": "^0.2.10",
     "svelte-easy-crop": "^2.0.1",
     "svelte-qrcode": "^1.0.0",
     "svelte-routing": "^2.5.0",

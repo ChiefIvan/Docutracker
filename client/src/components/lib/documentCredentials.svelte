@@ -6,6 +6,10 @@
   import moment from "moment";
   import Button from "../shared/Button.svelte";
   import QrCode from "svelte-qrcode";
+  import pdfMake from "pdfmake/build/pdfmake";
+  import pdfFonts from "pdfmake/build/vfs_fonts";
+
+  pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
   export let theDocument: Document;
 
@@ -60,26 +64,17 @@
       };
     });
 
-  let removeBtn = false;
-
-  const handleSave = () => {
-    const htmlContent = document.documentElement.outerHTML;
-
-    const blob = new Blob([htmlContent], { type: "text/html" });
-
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${theDocument.documentName}_${theDocument.codeData}_page.html`;
-
-    document.body.appendChild(a);
-    removeBtn = true;
-    a.click();
-    removeBtn = false;
-
-    URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+  const sampleGenerate = {
+    content: [
+      { text: `${theDocument.documentName}`, style: "header" },
+      "This is a sample PDF",
+    ],
+    styles: {
+      header: {
+        fontSize: 22,
+        bold: true,
+      },
+    },
   };
 </script>
 
@@ -359,7 +354,13 @@
     </div>
   </div>
   <div class="btn-wrapper">
-    <Button on:click={handleSave}>Save Data</Button>
+    <Button
+      on:click={() => {
+        pdfMake
+          .createPdf(sampleGenerate)
+          .download(`${theDocument.documentName}_${theDocument.codeData}`);
+      }}>Save Data</Button
+    >
     <Button on:click={handleClose}>Close</Button>
   </div>
 </div>

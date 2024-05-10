@@ -1,17 +1,14 @@
 <script lang="ts">
   import {
     dark,
-    handleFetch,
-    address,
     showMessage,
-    detailsExpand,
-    documentDetails,
     handleDetails,
+    documents,
+    userData,
     users,
     type RequestAPI,
     type ResponseData,
   } from "../../store";
-  import { navigate } from "svelte-routing";
   import { onMount } from "svelte";
   import { Html5Qrcode } from "html5-qrcode";
   import { createEventDispatcher } from "svelte";
@@ -23,14 +20,12 @@
   import Cropper from "svelte-easy-crop";
   import jsQR from "jsqr";
 
-  export let authToken = "";
-
   let scanning = false;
   let html5Qrcode: Html5Qrcode;
   let fileData: FileList;
-  let pixelCrop = "";
   let base64String: string | null;
   let crop: { x: number; y: number };
+  let pixelCrop;
   let zoom = 1;
   let dispatch = createEventDispatcher();
 
@@ -163,21 +158,32 @@
     decodedText: string,
     decodedResult: { decodedText: string; result: { text: string } }
   ) {
-    let user = $users.find((user) => {
-      let hasUser = user.documents.some(
-        (document) => document.codeData === decodedText
-      );
-      if (hasUser) return user;
-    });
+    if ($userData.previlage === "Secretary") {
+      let user = $users.find((user) => {
+        let hasUser = user.documents.some(
+          (document) => document.codeData === decodedText
+        );
+        if (hasUser) return user;
+      });
 
-    let document = user?.documents.find((document) => {
-      if (document.codeData === decodedText) return document;
-    });
+      let document = user?.documents.find((document) => {
+        if (document.codeData === decodedResult.decodedText) return document;
+      });
 
-    if (user && document) {
-      handleDetails(user.user_name, user.email, document);
-      dispatch("closeShortCut");
-      stop();
+      if (user && document) {
+        handleDetails(user.fullName, user.email, document);
+        dispatch("closeShortCut");
+        stop();
+      }
+    } else {
+      let document = $documents.find((document) => {
+        if (document.codeData === decodedResult.decodedText) return document;
+      });
+
+      if (document) {
+        handleDetails($userData.fullName, $userData.email, document);
+        dispatch("closeShortCut");
+      }
     }
   }
 
@@ -205,24 +211,39 @@
         let decodedQR = jsQR(imageData.data, img.width, img.height);
 
         if (decodedQR && decodedQR !== null && decodedQR.data) {
-          let user = $users.find((user) => {
-            let hasUser = user.documents.some(
-              (document) => document.codeData === decodedQR!.data
-            );
-            if (hasUser) return user;
-          });
+          if ($userData.previlage === "Secretary") {
+            let user = $users.find((user) => {
+              let hasUser = user.documents.some(
+                (document) => document.codeData === decodedQR!.data
+              );
+              if (hasUser) return user;
+            });
 
-          let document = user?.documents.find((document) => {
-            if (document.codeData === decodedQR!.data) return document;
-          });
+            let document = user?.documents.find((document) => {
+              if (document.codeData === decodedQR!.data) return document;
+            });
 
-          if (user && document) {
-            handleDetails(user.user_name, user.email, document);
-            dispatch("closeShortCut");
+            if (user && document) {
+              handleDetails(user.fullName, user.email, document);
+              dispatch("closeShortCut");
+            }
+          } else {
+            let document = $documents.find((document) => {
+              if (document.codeData === decodedQR!.data) return document;
+            });
+
+            if (document) {
+              handleDetails($userData.fullName, $userData.email, document);
+              dispatch("closeShortCut");
+            } else {
+              $showMessage = {
+                error: "There's no document associated with the Qr Code!",
+              };
+            }
           }
         } else {
           base64String = null;
-          $showMessage = { error: "No Qr Code Found" };
+          $showMessage = { error: "No Qr Code Found!" };
         }
       };
     }
@@ -230,7 +251,7 @@
 
   const handleBack = () => {
     dispatch("switch", "Scan Document");
-  }
+  };
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -289,8 +310,6 @@
     <Button on:click={handleFileSystemScan}>Scan</Button>
   </div>
 </div>
-
-
 
 <style>
   div.qr-wrapper {

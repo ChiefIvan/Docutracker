@@ -6,8 +6,7 @@
     theDocument,
     location,
     searchArray,
-    appDate,
-    comDate,
+    userData,
   } from "../../store";
 
   let focused = false;
@@ -19,15 +18,16 @@
 <!-- svelte-ignore a11y-mouse-events-have-key-events -->
 <input
   class:input={$documentSelected.length}
-  class:not-dashboard={$location === "/history"}
+  class:not-dashboard={$location === "/history" ||
+    $userData.previlage === "Secretary"}
   type="search"
   bind:value={$documentSelected}
-  placeholder="Search for Documents..."
+  placeholder={`${$userData.previlage !== "Secretary" ? "Search for Documents..." : "Search for Users..."} `}
   on:mouseover={() => (focused = true)}
   on:mouseout={() => (focused = false)}
 />
 
-{#if $location !== "/history"}
+{#if $location !== "/history" && $userData.previlage !== "Secretary"}
   {#if $documentSelected.length}
     <div
       class="search-wrapper"

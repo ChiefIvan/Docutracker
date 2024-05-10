@@ -12,10 +12,12 @@ export type SignUpBind = LoginBind & {
   cnfrmPasswordInput: boolean;
   employeeIDInput: boolean;
   unitInput: boolean;
-  otherInput: boolean;
+  programInput: boolean;
 };
 
 export type Credentials = {
+  documentInstitute: string;
+  program?: string;
   institute?: string;
   previlage?: string;
   email?: string;
@@ -138,6 +140,18 @@ export const searchArray = (array: Document[], searchTerm: string) => {
   });
 };
 
+export const searchUser = (array: Users[], searchTerm: string) => {
+  return array.filter((item) => {
+    const lowerCasedSearchTerm = searchTerm.toLowerCase();
+
+    // Customize the conditions based on your object properties
+    return (
+      item.email.toLowerCase().includes(lowerCasedSearchTerm) ||
+      item.fullName.toLowerCase().includes(lowerCasedSearchTerm)
+    );
+  });
+};
+
 export const sortArray = (array: Document[], sortName: string): Document[] => {
   if (sortName === "Name") {
     return array.sort((a, b) => a.documentName.localeCompare(b.documentName));
@@ -233,7 +247,9 @@ const handleGET = async (address: string, token: null | string) => {
   }
 };
 
+// export const address = "https://backend-tt9g.onrender.com";
 export const address = "http://127.0.0.1:5000";
+
 export const location = writable("/");
 export const documentSelected = writable("");
 export const appDate = writable("");
@@ -268,6 +284,7 @@ export const navExpand = writable(true);
 export const registrationExpand = writable(false);
 export const selectExpand = writable(false);
 export const selectProgramExpand = writable(false);
+export const selectInstituteExpand = writable(false);
 export const dark = writable(false);
 export const detailsExpand = writable(false);
 export const sortExpand = writable(false);

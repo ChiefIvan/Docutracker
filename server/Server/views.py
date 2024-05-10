@@ -47,6 +47,7 @@ def get_users():
                 "userImg": user.user_img,
                 "fullName": user.full_name,
                 "institute": user.institute,
+                "program": user.program,
                 "email": user.email,
                 "employeeID": user.employee_id,
                 "unit": user.designation,
@@ -87,6 +88,7 @@ def get_all_documents() -> dict:
             "userImg": user.user_img,
             "fullName": user.full_name,
             "institute": user.institute,
+            "program": user.program,
             "email": user.email,
             "EmployeeID": user.employee_id,
             "unit": user.designation,
@@ -104,6 +106,7 @@ def get_all_documents() -> dict:
                     "email": user.email,
                     "fullName": user.full_name,
                     "institute": user.institute,
+                    "program": user.program,
                     "userImg": user.user_img,
                     "designation": user.designation,
                     "documents": []
@@ -119,8 +122,9 @@ def get_all_documents() -> dict:
                     document_data = {
                         "documentID": document.id,
                         "documentName": document.name,
-                        "documentProgram": document.program,
+                        "documentInstitute": document.institute,
                         "attemps": document.attemp,
+                        "documentProgram": document.program,
                         "codeData": document.code,
                         "documentDescription": document.description,
                         "pending": document.pending,
@@ -325,6 +329,7 @@ def index():
             "previlage": user.previlage,
             "userImg": user.user_img,
             "fullName": user.full_name,
+            "program": user.program,
             "institute": user.institute,
             "email": user.email,
             "EmployeeID": user.employee_id,
@@ -345,6 +350,7 @@ def index():
                 "documentID": document.id,
                 "documentName": document.name,
                 "documentProgram": document.program,
+                "documentInstitute": document.institute,
                 "attemps": document.attemp,
                 "codeData": document.code,
                 "documentDescription": document.description,
@@ -430,19 +436,20 @@ def document_register():
         code = data["codeData"]
         document_name = data["documentName"]
         document_program = data["documentProgram"]
+        document_institute = data["documentInstitute"]
         description = data["documentDescription"]
         edit = data["edit"]
 
         print(data)
 
         entry_validate: RegisterEntryValidator = RegisterEntryValidator(
-            code, document_name, document_program, description).validate()
+            code, document_name, document_program, document_institute, description).validate()
 
         if isinstance(entry_validate, dict):
             return jsonify(entry_validate)
 
         sanitize: bool | dict = Sanitizer(
-            {"Document Name": document_name, "Program": document_program, "Document Code": code,
+            {"Document Name": document_name, "Document Program": document_program, "Document Institute": document_institute, "Document Code": code,
                 "Document Descripttion": description}
         ).validate()
 
@@ -457,6 +464,7 @@ def document_register():
 
             document.name = document_name
             document.program = document_program
+            document.institute = document_institute
             document.description = description
 
             db.session.commit()
@@ -466,6 +474,7 @@ def document_register():
             document: Documents = Documents(
                 name=document_name,
                 program=document_program,
+                institute=document_institute,
                 code=code,
                 attemp=0,
                 description=description,
