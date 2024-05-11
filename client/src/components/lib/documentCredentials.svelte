@@ -66,8 +66,65 @@
 
   const sampleGenerate = {
     content: [
-      { text: `${theDocument.documentName}`, style: "header" },
-      "This is a sample PDF",
+      {
+        text: `${theDocument.documentName}`,
+        style: "header",
+      },
+      {
+        layout: "lightHorizontalLines",
+        margin: [0, 20, 0, 0],
+        table: {
+          widths: ["*", "*"],
+          body: [
+            [{ text: "Credentials", bold: true }, ""],
+            ["Document Name", theDocument.documentName],
+            ["Document ID", theDocument.codeData],
+            ["Registered Date", theDocument.pendingDate],
+            ["Submit Attemps", theDocument.attemps],
+            ...theDocument.documentPath.map((path, i) => [
+              `${i + 1} Route (Approved By)`,
+              path.name,
+            ]),
+          ],
+        },
+      },
+      {
+        layout: "lightHorizontalLines",
+        margin: [0, 20, 0, 0],
+        table: {
+          widths: ["*", "*"],
+          body: [
+            [{ text: "Time Taken", bold: true }, ""],
+            ...theDocument.documentPath.map((path, i) => {
+              const duration = moment.duration(moment(path.approvedDate, "ddd, DD MMM YYYY HH:mm:ss z").diff(moment(path.confirmedDate, "ddd, DD MMM YYYY HH:mm:ss z")))
+              return [
+                path.name,
+                `${duration.hours()} hours, ${duration.minutes()} minutes, ${duration.seconds()} seconds`
+              ];
+            }),
+          ],
+        },
+      },
+      {
+        layout: "noBorders",
+        margin: [0, 30, 0, 0],
+        table: {
+          widths: ["*", "*"],
+          body: [
+            [{ text: "Document Description", bold: true }, ""],
+            [
+              theDocument.documentDescription,
+              {
+                qr: theDocument.codeData,
+                background: "white",
+                foreground: "#808080",
+                fit: "200",
+                margin: [80, -20, 0, 0],
+              },
+            ],
+          ],
+        },
+      },
     ],
     styles: {
       header: {

@@ -109,7 +109,6 @@ class UserValidation:
     def __init__(self, entries: dict):
 
         self.validators = [
-            EntryValidator(entries),
             Sanitizer(entries),
             EmailValidator(entries),
             PasswordValidator(entries)
