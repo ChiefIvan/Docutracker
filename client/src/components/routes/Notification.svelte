@@ -64,7 +64,7 @@
     {#if $notifications.length}
       {#each $notifications.reverse() as notification, i (i)}
         {@const date = moment(notification.date, "ddd, DD MMM YYYY HH:mm:ss z")}
-        {@const gapTime = moment.duration(now.diff(date))}
+        {@const gapTime = moment.duration(now.diff(date.subtract(8, "hours")))}
         <li class:dark={$dark}>
           <h2 class:dark={$dark}>
             {notification.title}

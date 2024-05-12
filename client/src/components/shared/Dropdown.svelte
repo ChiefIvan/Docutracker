@@ -36,7 +36,7 @@
     position: fixed;
     top: 3.5rem;
     right: 2.5rem;
-    z-index: 1;
+    z-index: 5;
 
     transition: all ease-in-out 400ms;
     background-color: var(--background);

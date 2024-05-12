@@ -259,7 +259,7 @@
   header.header {
     position: sticky;
     top: 0;
-    z-index: 3;
+    z-index: 4;
     background-color: var(--main-col-3);
     transition: background-color ease-in-out 400ms;
 

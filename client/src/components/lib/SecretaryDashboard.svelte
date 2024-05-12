@@ -80,22 +80,6 @@
               }
             }
 
-            if ($userData.unit === "Dean Office") {
-              if (user.designation === "Program Head") {
-                if (doc.documentName === "Application for Leave") {
-                  return true;
-                }
-              }
-            }
-
-            if ($userData.unit === "HROS") {
-              if (user.designation === "Dean Office") {
-                if (doc.documentName === "Application for Leave") {
-                  return true;
-                }
-              }
-            }
-
             return false;
           } else if (doc.documentPath.length) {
             if (
@@ -119,7 +103,10 @@
               doc.documentPath[doc.documentPath.length - 1].approved &&
               doc.documentPath[doc.documentPath.length - 1].confirmed
             ) {
-              if ($userData.unit === "Dean Office") {
+              if (
+                $userData.unit === "Dean Office" &&
+                $userData.institute === doc.deanInstitute
+              ) {
                 if (
                   doc.documentName === "Faculty Loading" ||
                   doc.documentName === "Requested Subject" ||
@@ -128,17 +115,12 @@
                   return true;
                 }
               }
-
-              if ($userData.unit === "HROS") {
-                if (doc.documentName === "Application for Leave") {
-                  return true;
-                }
-              }
             }
 
             if (
               doc.documentPath[doc.documentPath.length - 1].name ===
                 "Dean Office" &&
+              $userData.institute === doc.deanInstitute &&
               doc.documentPath[doc.documentPath.length - 1].approved &&
               !doc.documentPath[doc.documentPath.length - 1].confirmed
             ) {

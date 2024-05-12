@@ -49,6 +49,7 @@ class Documents(db.Model):
     program = db.Column(db.String(10), nullable=True)
     description = db.Column(db.String(1000), nullable=True)
     institute = db.Column(db.String(10), nullable=True)
+    dean_office_institute = db.Column(db.String(10), nullable=True)
     attemp = db.Column(db.Integer, nullable=True, default=0)
     pending = db.Column(db.Boolean, default=True)
     pending_date = db.Column(db.DateTime(), default=func.now())

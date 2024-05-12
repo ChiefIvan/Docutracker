@@ -123,6 +123,7 @@ def get_all_documents() -> dict:
                         "documentID": document.id,
                         "documentName": document.name,
                         "documentInstitute": document.institute,
+                        "deanInstitute": document.dean_office_institute,
                         "attemps": document.attemp,
                         "documentProgram": document.program,
                         "codeData": document.code,
@@ -351,6 +352,7 @@ def index():
                 "documentName": document.name,
                 "documentProgram": document.program,
                 "documentInstitute": document.institute,
+                "deanInstitute": document.dean_office_institute,
                 "attemps": document.attemp,
                 "codeData": document.code,
                 "documentDescription": document.description,
@@ -437,13 +439,14 @@ def document_register():
         document_name = data["documentName"]
         document_program = data["documentProgram"]
         document_institute = data["documentInstitute"]
+        dean_institute = data["deanInstitute"]
         description = data["documentDescription"]
         edit = data["edit"]
 
         print(data)
 
         entry_validate: RegisterEntryValidator = RegisterEntryValidator(
-            code, document_name, document_program, document_institute, description).validate()
+            code, document_name, document_program, document_institute, dean_institute, description).validate()
 
         if isinstance(entry_validate, dict):
             return jsonify(entry_validate)
@@ -465,6 +468,7 @@ def document_register():
             document.name = document_name
             document.program = document_program
             document.institute = document_institute
+            document.dean_office_institute = dean_institute
             document.description = description
 
             db.session.commit()
@@ -475,6 +479,7 @@ def document_register():
                 name=document_name,
                 program=document_program,
                 institute=document_institute,
+                dean_office_institute=dean_institute,
                 code=code,
                 attemp=0,
                 description=description,

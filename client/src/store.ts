@@ -16,6 +16,7 @@ export type SignUpBind = LoginBind & {
 };
 
 export type Credentials = {
+  deanInstitute: string;
   documentInstitute: string;
   program?: string;
   institute?: string;
@@ -285,6 +286,7 @@ export const registrationExpand = writable(false);
 export const selectExpand = writable(false);
 export const selectProgramExpand = writable(false);
 export const selectInstituteExpand = writable(false);
+export const selectDeanInstituteExpand = writable(false);
 export const dark = writable(false);
 export const detailsExpand = writable(false);
 export const sortExpand = writable(false);

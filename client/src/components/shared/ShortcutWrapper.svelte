@@ -30,7 +30,7 @@
     {shortcutData} -->
   {:else if shortcutData === "Scan Document"}
     {#if $userData.full_ver_val}
-      <ScanDocument {authToken} on:switch on:closeShortCut></ScanDocument>
+      <ScanDocument on:switch on:closeShortCut></ScanDocument>
     {:else}
       <UnverifiedComp></UnverifiedComp>
     {/if}
@@ -48,7 +48,7 @@
     right: 0;
     background-color: var(--main-col-5);
     height: calc(100vh - 43.16px);
-    z-index: 2;
+    z-index: 4;
   }
 
   div.shortcut-wrapper::-webkit-scrollbar {

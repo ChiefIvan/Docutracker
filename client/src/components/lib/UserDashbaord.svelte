@@ -127,6 +127,7 @@
   let documentCodeSelected = "";
   let documentProgramSelected = "";
   let documentInstituteSelected = "";
+  let deanInstituteSelected = "";
 
   const handleDocumentEdit = (documentName: string, documentID: string) => {
     for (let document of $documents) {
@@ -137,6 +138,7 @@
         documentCodeSelected = document.codeData;
         documentDesSelected = document.documentDescription;
         documentInstituteSelected = document.documentInstitute;
+        deanInstituteSelected = document.deanInstitute;
         documentProgramSelected = document.documentProgram;
       }
     }
@@ -145,6 +147,7 @@
       documentName: documentName,
       documentProgram: documentProgramSelected,
       documentInstitute: documentInstituteSelected,
+      deanInstitute: deanInstituteSelected,
       codeData: documentCodeSelected,
       documentDes: documentDesSelected,
       isEdit: true,

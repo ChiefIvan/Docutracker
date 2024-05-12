@@ -196,7 +196,7 @@
 
   $: newUser.unit &&
   newUser.unit.length &&
-  newUser.unit === "Program Head" &&
+  ["Program Head", "Dean Office", "Secretary"].includes(newUser.unit) &&
   !newUser.institute
     ? (instituteVerified = false)
     : (instituteVerified = true);
@@ -318,13 +318,16 @@
       return;
     }
 
-    if (newUser.unit === "Program Head" && !newUser.institute.length) {
+    if (
+      ["Program Head", "Dean Office", "Secretary"].includes(newUser.unit) &&
+      !newUser.institute.length
+    ) {
       $showMessage = { error: "Please select a proper institute!" };
       return;
     }
 
-    if (newUser.institute.length && !newUser.program.length) {
-      $showMessage = { error: "Please select a proper institute!" };
+    if (newUser.institute === "Program Head" && !newUser.program.length) {
+      $showMessage = { error: "Please select a proper Program!" };
       return;
     }
 
@@ -611,16 +614,14 @@
           <option value="Secretary">Secretary</option>
         </select>
       </div>
-      {#if newUser.unit === "Program Head"}
+      {#if ["Program Head", "Dean Office", "Secretary"].includes(newUser.unit)}
         <div class="select-wrapper">
           <label for="institute-select" class="select-title" class:dark={$dark}
             >Institute</label
           >
           <select
             class="institutes"
-            on:change={(event) => {
-              newUser.institute = event?.target.value;
-            }}
+            bind:value={newUser.institute}
             name="programs"
             id="institute-select"
           >
@@ -631,7 +632,7 @@
             <option value="FNAHS">FNAHS</option>
             <option value="FTED">FTED</option>
           </select>
-          {#if newUser.institute && newUser.institute.length}
+          {#if newUser.unit === "Program Head" && newUser.institute && newUser.institute.length}
             <div class="others-wrapper">
               <Input
                 inputType="text"

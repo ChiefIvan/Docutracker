@@ -183,6 +183,7 @@
       if (document) {
         handleDetails($userData.fullName, $userData.email, document);
         dispatch("closeShortCut");
+        stop();
       }
     }
   }
