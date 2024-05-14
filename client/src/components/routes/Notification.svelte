@@ -2,7 +2,7 @@
   import { notifications, dark } from "../../store";
 
   import moment from "moment";
-  let now = moment(moment().format("ddd, DD MMM YYYY HH:mm:ss z"));
+  let now = moment();
 
   // const data = [
   //   {
@@ -63,8 +63,11 @@
   <ul class="notification-render">
     {#if $notifications.length}
       {#each $notifications.reverse() as notification, i (i)}
-        {@const date = moment(notification.date, "ddd, DD MMM YYYY HH:mm:ss z")}
-        {@const gapTime = moment.duration(now.diff(date.subtract(8, "hours")))}
+        {@const date = moment(
+          notification.date,
+          "ddd, DD MMM YYYY HH:mm:ss z"
+        ).subtract(-8, "hours")}
+        {@const gapTime = moment.duration(now.diff(date))}
         <li class:dark={$dark}>
           <h2 class:dark={$dark}>
             {notification.title}

@@ -401,11 +401,24 @@
       </div>
     </div>
   {:else}
-    There's no user yet!
+    <h1 class="no-user" class:dark={$dark}>There's no user yet!</h1>
   {/if}
 </main>
 
 <style>
+  h1 {
+    transition: all ease-in-out 300ms;
+    text-align: center;
+    margin: 5rem 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--scroll-color);
+  }
+
+  & h1.dark {
+    color: var(--background);
+  }
+
   div.details-wrapper {
     position: fixed;
     inset: 0;

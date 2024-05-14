@@ -61,6 +61,7 @@ def admin_login():
             full_name="",
             institute="Admin",
             email=data["email"],
+            program="",
             employee_id="",
             designation="",
             password="",

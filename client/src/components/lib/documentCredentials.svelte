@@ -1,15 +1,20 @@
 <script lang="ts">
   import { dark, type Document } from "../../store";
   import { scale } from "svelte/transition";
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
 
   import moment from "moment";
   import Button from "../shared/Button.svelte";
   import QrCode from "svelte-qrcode";
   import pdfMake from "pdfmake/build/pdfmake";
   import pdfFonts from "pdfmake/build/vfs_fonts";
+  (<any>pdfMake).vfs = pdfFonts.pdfMake.vfs;
 
-  pdfMake.vfs = pdfFonts.pdfMake.vfs;
+  onMount(async () => {
+    const lib = await import("pdfmake/build/vfs_fonts");
+    const pdfFonts = lib.pdfFonts;
+    (<any>pdfMake).vfs = pdfFonts.pdfMake.vfs;
+  });
 
   export let theDocument: Document;
 
@@ -96,10 +101,18 @@
           body: [
             [{ text: "Time Taken", bold: true }, ""],
             ...theDocument.documentPath.map((path, i) => {
-              const duration = moment.duration(moment(path.approvedDate, "ddd, DD MMM YYYY HH:mm:ss z").diff(moment(path.confirmedDate, "ddd, DD MMM YYYY HH:mm:ss z")))
+              let approvedDate = moment(
+                path.approvedDate,
+                "ddd, DD MMM YYYY HH:mm:ss z"
+              );
+              let confirmedDate = moment(
+                path.confirmedDate,
+                "ddd, DD MMM YYYY HH:mm:ss z"
+              );
+              let duration = moment.duration(confirmedDate.diff(approvedDate));
               return [
                 path.name,
-                `${duration.hours()} hours, ${duration.minutes()} minutes, ${duration.seconds()} seconds`
+                `${duration.hours()} hours, ${duration.minutes()} minutes, ${duration.seconds()} seconds`,
               ];
             }),
           ],
