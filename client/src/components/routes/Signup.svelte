@@ -607,14 +607,15 @@
           id="office-select"
         >
           <option value="">Select an Option</option>
+          <option value="Faculty">Faculty</option>
+          <option value="Secretary">Secretary</option>
           <option value="Program Head">Program Head</option>
           <option value="Dean Office">Dean Office</option>
           <option value="Academic VP">Academic VP</option>
           <option value="OP">OP</option>
-          <option value="Secretary">Secretary</option>
         </select>
       </div>
-      {#if ["Program Head", "Dean Office", "Secretary"].includes(newUser.unit)}
+      {#if ["Program Head", "Dean Office", "Secretary", "Faculty"].includes(newUser.unit)}
         <div class="select-wrapper">
           <label for="institute-select" class="select-title" class:dark={$dark}
             >Institute</label
@@ -632,7 +633,7 @@
             <option value="FNAHS">FNAHS</option>
             <option value="FTED">FTED</option>
           </select>
-          {#if newUser.unit === "Program Head" && newUser.institute && newUser.institute.length}
+          {#if ["Program Head", "Faculty"].includes(newUser.unit) && newUser.institute && newUser.institute.length}
             <div class="others-wrapper">
               <Input
                 inputType="text"

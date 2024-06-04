@@ -21,16 +21,18 @@
   export let authToken = "";
 
   let commentValue = "";
+  let remarksValue = "";
   let openComment = false;
 
   const approvalRequest: RequestAPI = {
     method: "POST",
     address: `${address}/document_approval`,
-    credentials: {
+    credentoials: {
       approval: "",
       unit: "",
       codeData: "",
       comment: "",
+      remarks: "",
     },
   };
 
@@ -40,6 +42,7 @@
     approvalRequest.credentials!.unit = $userData.unit;
     approvalRequest.credentials!.codeData = $documentDetails.documentD.codeData;
     approvalRequest.credentials!.comment = commentValue;
+    approvalRequest.credentials!.remarks = remarksValue;
 
     const response: ResponseData = await handleFetch(
       approvalRequest,
@@ -107,9 +110,9 @@
     <form on:submit|preventDefault={() => handleApproval("disapproved")}>
       <textarea
         bind:value={commentValue}
-        placeholder="Comment of Rejection (Mandatory)"
+        placeholder="Return Message (e.g Why the document is being returned)"
       ></textarea>
-      <Button critical={true}>Reject</Button>
+      <Button critical={true}>Return</Button>
     </form>
   </div>
 {/if}
@@ -117,7 +120,7 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
   transition:fade
-  on:click={() => ($detailsExpand = false)}
+  on:click|self={() => ($detailsExpand = false)}
   class="document-details-wrapper"
 >
   <!-- <div
@@ -262,6 +265,9 @@
       {/if}
     </div>
   </div>
+  {#if lastRoute && lastRoute.approved && !lastRoute.confirmed && $filterName === "Self"}
+    <textarea bind:value={remarksValue} placeholder="Remarks"></textarea>
+  {/if}
   <div class="button-wrapper">
     {#if $userData.previlage !== "User"}
       {#if $documentDetails.documentD.documentPath.length}
@@ -288,7 +294,7 @@
           <Button
             hoverized={true}
             critical={true}
-            on:click={() => (openComment = !openComment)}>Reject</Button
+            on:click={() => (openComment = !openComment)}>Return</Button
           >
           <Button hoverized={true} on:click={() => handleApproval("approved")}
             >Approved</Button
@@ -298,7 +304,7 @@
         <Button
           hoverized={true}
           critical={true}
-          on:click={() => (openComment = !openComment)}>Reject</Button
+          on:click={() => (openComment = !openComment)}>Return</Button
         >
         <Button hoverized={true} on:click={() => handleApproval("approved")}
           >Approved</Button
@@ -321,6 +327,17 @@
 </div>
 
 <style>
+  textarea {
+    width: inherit;
+    height: 10rem;
+    margin-bottom: 0.5rem;
+    outline: none;
+    padding: 0.5rem;
+    border: 1px solid var(--header-color);
+    border-radius: 0.5rem;
+    width: 50rem;
+  }
+
   div.comment-wrapper {
     position: fixed;
     inset: 0;
@@ -333,28 +350,17 @@
     background-color: rgba(0, 0, 0, 0.7);
 
     & div.back-wrapper {
-      max-width: 30rem;
-      width: 100%;
+      width: 50rem;
     }
 
     & form {
-      max-width: 30rem;
+      max-width: 50rem;
       width: 100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       row-gap: 0.5rem;
-
-      & textarea {
-        width: inherit;
-        height: 10rem;
-        margin-bottom: 0.5rem;
-        outline: none;
-        padding: 0.5rem;
-        border: 1px solid var(--header-color);
-        border-radius: 0.5rem;
-      }
     }
   }
 

@@ -75,6 +75,7 @@ class Route(db.Model):
     processing = db.Column(db.Boolean, default=True)
     disapproved_date = db.Column(db.DateTime(), nullable=True)
     rej_comment = db.Column(db.String(50), nullable=True)
+    remarks = db.Column(db.String(50), nullable=True)
     approved_date = db.Column(db.DateTime(), nullable=True)
     confirmed = db.Column(db.Boolean, default=False)
     confirmed_date = db.Column(db.DateTime(), nullable=True)

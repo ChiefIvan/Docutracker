@@ -257,10 +257,10 @@
       id: 3,
       name: "Endorsement Form",
     },
-    // {
-    //   id: 4,
-    //   name: "Application for Leave",
-    // },
+    {
+      id: 4,
+      name: "Others: Please Specify!",
+    },
   ];
 
   const instituteSelection = ["FALS", "FCDSET", "FGBM", "FNAHS", "FTED"];
@@ -274,7 +274,12 @@
 
   let openRoutes = false;
 
-  const handleSave = () => {};
+  let selectedID = 0;
+  let openOther = false;
+
+  $: if (selectedID === 4) {
+    openOther = !openOther;
+  }
 </script>
 
 {#if openRoutes}
@@ -440,6 +445,10 @@
   </div>
 {/if}
 
+{#if openOther}
+  <div class="overlay">sample</div>
+{/if}
+
 <div class="register-document-wrapper">
   <form
     class="register-document-form"
@@ -447,7 +456,10 @@
     autocomplete="off"
   >
     <div class="credential-wrapper">
-      <span class="date" class:dark={$dark}>Author: {$userData.unit} </span>
+      <h2 class="unit-title">{$userData.unit}'s Documents</h2>
+      <span class="date" class:dark={$dark}
+        >Author/Owner: {$userData.fullName}
+      </span>
       <!-- svelte-ignore missing-declaration -->
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -476,6 +488,7 @@
                   instituteSelected = "";
                   deanInstituteSelected = "";
                   documentSelected = value.name;
+                  selectedID = value.id;
                 }}
               >
                 <span
@@ -501,7 +514,7 @@
             </p>
           {/if}
         </div>
-        {#if documentSelected.length}
+        {#if documentSelected.length && selectedID !== 4}
           <Button
             on:click={() => {
               openRoutes = !openRoutes;
@@ -622,6 +635,12 @@
 </div>
 
 <style>
+  h2.unit-title {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--scroll-color);
+  }
+
   h1.unit-name {
     font-size: 1rem;
     color: var(--input-color);

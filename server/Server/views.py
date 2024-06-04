@@ -136,6 +136,7 @@ def get_all_documents() -> dict:
                             "approved": route.approved,
                             "disapprovedDate": route.disapproved_date,
                             "comment": route.rej_comment,
+                            "remarks": route.remarks,
                             "processing": route.processing,
                             "approvedDate": route.approved_date,
                             "confirmed": route.confirmed,
@@ -177,6 +178,7 @@ def document_approval() -> dict:
                 name=data["unit"],
                 approved=True,
                 disapproved_date=None,
+                remarks=None,
                 rej_comment=None,
                 processing=True,
                 approved_date=datetime.now(),
@@ -209,6 +211,7 @@ def document_approval() -> dict:
                 name=data["unit"],
                 approved=False,
                 disapproved_date=datetime.now(),
+                remarks=None,
                 rej_comment=data["comment"],
                 processing=False,
                 approved_date=None,
@@ -236,6 +239,7 @@ def document_approval() -> dict:
             if not route:
                 return jsonify({"error": "There's no document, please register one first!"})
 
+            route.remarks = data["remarks"]
             route.confirmed = True
             route.confirmed_date = datetime.now()
 
@@ -369,6 +373,7 @@ def index():
                 "approvedDate": route.approved_date,
                 "disapprovedDate": route.disapproved_date,
                 "comment": route.rej_comment,
+                "remarks": route.remarks,
                 "confirmed": route.confirmed,
                 "confirmedDate": route.confirmed_date,
                 "finished": route.finished,

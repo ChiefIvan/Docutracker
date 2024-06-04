@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from captcha.image import ImageCaptcha
 from io import BytesIO
 from base64 import b64encode
-from string import ascii_lowercase, digits
+from string import digits
 from random import choice
 from uuid import uuid4
 
