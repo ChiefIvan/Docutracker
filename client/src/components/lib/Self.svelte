@@ -175,6 +175,7 @@
                   handleDetails(
                     filteredUser.user_name,
                     filteredUser.email,
+                    filteredUser.designation,
                     document,
                     "tab1"
                   )}

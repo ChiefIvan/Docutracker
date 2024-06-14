@@ -8,6 +8,7 @@
     selectProgramExpand,
     selectInstituteExpand,
     selectDeanInstituteExpand,
+    selectRouteExpand,
     dark,
     sortExpand,
     filterExpand,
@@ -45,6 +46,10 @@
 
     if ($selectDeanInstituteExpand) {
       $selectDeanInstituteExpand = false;
+    }
+
+    if ($selectRouteExpand) {
+      $selectRouteExpand = false;
     }
 
     if ($sortExpand) {

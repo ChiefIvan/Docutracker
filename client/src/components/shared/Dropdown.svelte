@@ -8,6 +8,7 @@
   export let secretary = false;
   export let self = false;
   export let admin = false;
+  export let customRoute = false;
 </script>
 
 <div
@@ -19,6 +20,7 @@
   class:secretary
   class:self
   class:admin
+  class:customRoute
   class:wrapper-expand={expand}
   class:dark={$dark}
 >
@@ -90,6 +92,13 @@
     top: 2.5rem;
     right: 0;
     width: 10rem;
+  }
+
+  div.customRoute {
+    position: absolute;
+    /* top: rem; */
+    left: 0;
+    right: 0;
   }
 
   div.wrapper-expand {

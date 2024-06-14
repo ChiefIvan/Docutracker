@@ -5,6 +5,7 @@
     sortExpand,
     searchArray,
     sortArray,
+    userData,
     handleDetails,
     type Document,
   } from "../../store";
@@ -303,7 +304,7 @@
                   transition:fade
                   animate:flip={{ duration: 500 }}
                   on:click|stopPropagation={() =>
-                    handleDetails("", "", document)}
+                    handleDetails("", "", $userData.unit, document)}
                 >
                   <div
                     class="name"
@@ -350,7 +351,7 @@
                   transition:fade
                   animate:flip={{ duration: 500 }}
                   on:click|stopPropagation={() =>
-                    handleDetails("", "", document)}
+                    handleDetails("", "", $userData.unit, document)}
                 >
                   <div
                     class="name"
@@ -399,7 +400,7 @@
                   transition:fade
                   animate:flip={{ duration: 500 }}
                   on:click|stopPropagation={() =>
-                    handleDetails("", "", document)}
+                    handleDetails("", "", $userData.unit, document)}
                 >
                   <div
                     class="name"
@@ -439,7 +440,7 @@
                   transition:fade
                   animate:flip={{ duration: 500 }}
                   on:click|stopPropagation={() =>
-                    handleDetails("", "", document)}
+                    handleDetails("", "", $userData.unit, document)}
                 >
                   <div
                     class="name"
@@ -479,7 +480,7 @@
                   transition:fade
                   animate:flip={{ duration: 500 }}
                   on:click|stopPropagation={() =>
-                    handleDetails("", "", document)}
+                    handleDetails("", "", $userData.unit, document)}
                 >
                   <div
                     class="name"

@@ -8,6 +8,7 @@
     selectProgramExpand,
     selectInstituteExpand,
     selectDeanInstituteExpand,
+    selectRouteExpand,
     modeExpand,
     userData,
     documents,
@@ -24,6 +25,7 @@
   import TriangleIcon from "../icons/TriangleIcon.svelte";
   import MediaQuery from "../shared/MediaQuery.svelte";
   import Dropdown from "../shared/Dropdown.svelte";
+  import Input from "../shared/Input.svelte";
 
   let placeholderHovered = false;
   let qrCodeElement: any;
@@ -77,7 +79,6 @@
   let programSelected = "";
   let documentSelected = "";
   let instituteSelected = "";
-  let deanInstituteSelected = "";
   let edit = false;
 
   onMount(() => {
@@ -95,7 +96,6 @@
       documentSelected = documentName;
       programSelected = documentProgram;
       instituteSelected = documentInstitute;
-      deanInstituteSelected = deanInstitute;
       documentDescription = documentDes;
       value = codeData;
       edit = isEdit;
@@ -118,11 +118,39 @@
     },
   };
 
+  const instituteSelection = ["FALS", "FCDSET", "FGBM", "FNAHS", "FTED"];
+  const programSelection = {
+    FALS: ["BSB", "BSA", "BSES", "BSAM", "BSDC"],
+    FCDSET: ["BSCE", "BSM", "BITM", "BSIT"],
+    FGBM: ["BSC", "BSBA", "BSHM"],
+    FNAHS: ["BSN"],
+    FTED: ["BEE", "BECE", "BSNE", "BTLE"],
+  };
+
   const handleSubmit = async () => {
+    if ($userData.institute === "FALS") {
+      registrationRequest.credentials!.deanInstitute = "FALS";
+    }
+
+    if ($userData.institute === "FCDSET") {
+      registrationRequest.credentials!.deanInstitute = "FCDSET";
+    }
+
+    if ($userData.institute === "FGBM") {
+      registrationRequest.credentials!.deanInstitute = "FGBM";
+    }
+
+    if ($userData.institute === "FNAHS") {
+      registrationRequest.credentials!.deanInstitute = "FNAHS";
+    }
+
+    if ($userData.institute === "FTED") {
+      registrationRequest.credentials!.deanInstitute = "FTED";
+    }
+
     registrationRequest.credentials!.codeData = value;
     registrationRequest.credentials!.documentName = documentSelected;
     registrationRequest.credentials!.documentInstitute = instituteSelected;
-    registrationRequest.credentials!.deanInstitute = deanInstituteSelected;
     registrationRequest.credentials!.documentName = documentSelected;
     registrationRequest.credentials!.documentProgram = programSelected;
     registrationRequest.credentials!.documentDescription = documentDescription;
@@ -133,23 +161,22 @@
       return;
     }
 
-    if (!instituteSelected.length) {
-      $showMessage = {
-        error: "Please Select proper Institue of the Program Head first!",
-      };
-      return;
-    }
+    if (!customDocumentname.length) {
+      if (!instituteSelected.length) {
+        if (!["Program Head", "Dean Office"].includes($userData.unit)) {
+          $showMessage = {
+            error: "Please Select proper Institue of the Program Head first!",
+          };
+          return;
+        }
+      }
 
-    if (!programSelected.length) {
-      $showMessage = { error: "Please Select a Program first!" };
-      return;
-    }
-
-    if (!deanInstituteSelected.length) {
-      $showMessage = {
-        error: "Please Select proper Institue of the Dean Office first!",
-      };
-      return;
+      if (!["Program Head", "Dean Office"].includes($userData.unit)) {
+        if (!programSelected.length) {
+          $showMessage = { error: "Please Select a Program first!" };
+          return;
+        }
+      }
     }
 
     if (!documentDescription.length) {
@@ -263,15 +290,6 @@
     },
   ];
 
-  const instituteSelection = ["FALS", "FCDSET", "FGBM", "FNAHS", "FTED"];
-  const programSelection = {
-    FALS: ["BSB", "BSA", "BSES", "BSAM", "BSDC"],
-    FCDSET: ["BSCE", "BSM", "BITM", "BSIT"],
-    FGBM: ["BSC", "BSBA", "BSHM"],
-    FNAHS: ["BSN"],
-    FTED: ["BEE", "BECE", "BSNE", "BTLE"],
-  };
-
   let openRoutes = false;
 
   let selectedID = 0;
@@ -280,6 +298,22 @@
   $: if (selectedID === 4) {
     openOther = !openOther;
   }
+
+  let customDocumentname = "";
+  let routeSelected = "";
+  let selectedRoutes = [];
+
+  const routeSelection = [
+    { id: 0, name: "Secretary" },
+    { id: 1, name: "Program Head" },
+    { id: 2, name: "Dean Office" },
+    { id: 3, name: "Academic VP" },
+    { id: 4, name: "OP" },
+  ];
+
+  const handleCustomSubmit = () => {
+    documentSelected = customDocumentname;
+  };
 </script>
 
 {#if openRoutes}
@@ -293,69 +327,19 @@
     <div class="select-route" class:dark={$dark}>
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <h1 class:dark={$dark} class="unit-name">Program Head</h1>
-      <div class="program-head">
-        <div
-          class="selected-wrapper"
-          on:click|stopPropagation={handleInstituteExpand}
-          transition:fade
-        >
-          <div
-            class="selected"
-            use:tooltip={{
-              content:
-                "One of routes of this document is Program Head, you must select what institute of the Program Head that recieves this document",
-              animation: "perspective-subtle",
-              theme: "tooltip",
-              offset: [0, 0],
-              placement: "bottom",
-            }}
-            class:dark={$dark}
-          >
-            <p class:dark={$dark}>
-              {#if instituteSelected && instituteSelected.length !== 0}
-                {instituteSelected}
-              {:else}
-                Please select an Institute
-              {/if}
-            </p>
-            <TriangleIcon rotate={$selectInstituteExpand}></TriangleIcon>
-          </div>
-          <Dropdown expand={$selectInstituteExpand} docs={true}>
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-            {#each instituteSelection as value, i (i)}
-              <li
-                class="list-wrapper"
-                class:active={value === instituteSelected}
-                class:dark={$dark}
-                on:click={() => {
-                  instituteSelected = value;
-                  programSelected = "";
-                }}
-              >
-                <span
-                  class="document-name"
-                  class:dark={$dark}
-                  class:active={value === instituteSelected}>{value}</span
-                >
-              </li>
-            {/each}
-          </Dropdown>
-        </div>
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
-        {#if instituteSelected && instituteSelected.length !== 0}
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
+      {#if !["Program Head", "Dean Office"].includes($userData.unit)}
+        <h1 class:dark={$dark} class="unit-name">Program Head</h1>
+        <div class="program-head">
           <div
             class="selected-wrapper"
-            on:click|stopPropagation={handleProgramExpand}
+            on:click|stopPropagation={handleInstituteExpand}
             transition:fade
           >
             <div
               class="selected"
               use:tooltip={{
                 content:
-                  "You must also select what program of the Program Head that recieves this document",
+                  "One of routes of this document is Program Head, you must select what institute of the Program Head that recieves this document",
                 animation: "perspective-subtle",
                 theme: "tooltip",
                 offset: [0, 0],
@@ -364,89 +348,197 @@
               class:dark={$dark}
             >
               <p class:dark={$dark}>
-                {#if programSelected && programSelected.length !== 0}
-                  {programSelected}
+                {#if instituteSelected && instituteSelected.length !== 0}
+                  {instituteSelected}
                 {:else}
-                  Please select a Program
+                  Please select an Institute
                 {/if}
               </p>
-              <TriangleIcon rotate={$selectProgramExpand}></TriangleIcon>
+              <TriangleIcon rotate={$selectInstituteExpand}></TriangleIcon>
             </div>
-            <Dropdown expand={$selectProgramExpand} docs={true}>
+            <Dropdown expand={$selectInstituteExpand} docs={true}>
               <!-- svelte-ignore a11y-click-events-have-key-events -->
               <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-              {#each programSelection[instituteSelected] as value, i (i)}
+              {#each instituteSelection as value, i (i)}
                 <li
                   class="list-wrapper"
-                  class:active={value === programSelected}
+                  class:active={value === instituteSelected}
                   class:dark={$dark}
-                  on:click={() => (programSelected = value)}
+                  on:click={() => {
+                    instituteSelected = value;
+                    programSelected = "";
+                  }}
                 >
                   <span
                     class="document-name"
                     class:dark={$dark}
-                    class:active={value === programSelected}>{value}</span
+                    class:active={value === instituteSelected}>{value}</span
                   >
                 </li>
               {/each}
             </Dropdown>
           </div>
-        {/if}
-      </div>
-      <div
-        class="selected-wrapper"
-        on:click|stopPropagation={handleDeanInstituteExpand}
-        transition:fade
-      >
-        <h1 class:dark={$dark} class="unit-name">Dean Office</h1>
-        <div
-          class="selected"
-          use:tooltip={{
-            content:
-              "One of routes of this document is Dean Office, you must select what institute of the Dean Office that recieves this document",
-            animation: "perspective-subtle",
-            theme: "tooltip",
-            offset: [0, 0],
-            placement: "bottom",
-          }}
-          class:dark={$dark}
-        >
-          <p class:dark={$dark}>
-            {#if deanInstituteSelected && deanInstituteSelected.length !== 0}
-              {deanInstituteSelected}
-            {:else}
-              Please select an Institute
-            {/if}
-          </p>
-          <TriangleIcon rotate={$selectDeanInstituteExpand}></TriangleIcon>
-        </div>
-        <Dropdown expand={$selectDeanInstituteExpand} docs={true}>
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-          {#each instituteSelection as value, i (i)}
-            <li
-              class="list-wrapper"
-              class:active={value === deanInstituteSelected}
-              class:dark={$dark}
-              on:click={() => {
-                deanInstituteSelected = value;
-              }}
+          <!-- svelte-ignore a11y-no-static-element-interactions -->
+          {#if instituteSelected && instituteSelected.length !== 0}
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <div
+              class="selected-wrapper"
+              on:click|stopPropagation={handleProgramExpand}
+              transition:fade
             >
-              <span
-                class="document-name"
+              <div
+                class="selected"
+                use:tooltip={{
+                  content:
+                    "You must also select what program of the Program Head that recieves this document",
+                  animation: "perspective-subtle",
+                  theme: "tooltip",
+                  offset: [0, 0],
+                  placement: "bottom",
+                }}
                 class:dark={$dark}
-                class:active={value === deanInstituteSelected}>{value}</span
               >
-            </li>
-          {/each}
-        </Dropdown>
-      </div>
+                <p class:dark={$dark}>
+                  {#if programSelected && programSelected.length !== 0}
+                    {programSelected}
+                  {:else}
+                    Please select a Program
+                  {/if}
+                </p>
+                <TriangleIcon rotate={$selectProgramExpand}></TriangleIcon>
+              </div>
+              <Dropdown expand={$selectProgramExpand} docs={true}>
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                {#each programSelection[instituteSelected] as value, i (i)}
+                  <li
+                    class="list-wrapper"
+                    class:active={value === programSelected}
+                    class:dark={$dark}
+                    on:click={() => (programSelected = value)}
+                  >
+                    <span
+                      class="document-name"
+                      class:dark={$dark}
+                      class:active={value === programSelected}>{value}</span
+                    >
+                  </li>
+                {/each}
+              </Dropdown>
+            </div>
+          {/if}
+        </div>
+      {/if}
     </div>
   </div>
 {/if}
 
 {#if openOther}
-  <div class="overlay">sample</div>
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <div class="overlay">
+    <div class="main-wrapper">
+      <div class="custom-document-wrapper">
+        <Input
+          overlap
+          inputName="Document Name"
+          inputType="text"
+          on:input={(e) => (customDocumentname = e.target.value)}
+        ></Input>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <div
+          class="selected-wrapper"
+          on:click|stopPropagation={() =>
+            ($selectRouteExpand = !$selectRouteExpand)}
+          transition:fade
+        >
+          <div class="selected">
+            <p class:dark={$dark}>
+              {#if routeSelected && routeSelected.length !== 0}
+                {routeSelected}
+              {:else}
+                Please select Routes
+              {/if}
+            </p>
+            <Dropdown customRoute={true} expand={$selectRouteExpand}>
+              {#each routeSelection as route (route.id)}
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                <li
+                  class="list-wrapper"
+                  class:active={route.name === routeSelected}
+                  class:dark={$dark}
+                  on:click={() => {
+                    if (customDocumentname.length) {
+                      selectedRoutes = [
+                        ...selectedRoutes,
+                        {
+                          id: route.id,
+                          name: route.name,
+                          institute: "",
+                          program: "",
+                        },
+                      ];
+                    } else {
+                      $showMessage = {
+                        error: "Please Write the name of the Document first!",
+                      };
+                    }
+                  }}
+                >
+                  <span
+                    class="document-name"
+                    class:dark={$dark}
+                    class:active={route.name === routeSelected}
+                    >{route.name}</span
+                  >
+                </li>
+              {/each}
+            </Dropdown>
+          </div>
+        </div>
+        <div class="button-wrapper">
+          <Button
+            on:click={() => {
+              selectedID = 0;
+              openOther = false;
+              documentSelected = "";
+              selectedRoutes = [];
+              customDocumentname = "";
+            }}>Go Back</Button
+          >
+          <Button
+            on:click={() => {
+              selectedID = 0;
+              handleCustomSubmit();
+              openOther = false;
+            }}>Submit</Button
+          >
+        </div>
+      </div>
+      {#if customDocumentname.length}
+        <div class="summary-wrapper" transition:fade>
+          <h1>Summary</h1>
+          <h2>{customDocumentname}</h2>
+          <div class="selected-route-wrapper">
+            <h1>Route Selected</h1>
+            {#each selectedRoutes as route (route.id)}
+              <p
+                use:tooltip={{
+                  content: "Click to Remove",
+                  animation: "perspective-subtle",
+                  theme: "tooltip",
+                }}
+              >
+                {route.name}
+              </p>
+            {/each}
+          </div>
+        </div>
+      {/if}
+    </div>
+  </div>
 {/if}
 
 <div class="register-document-wrapper">
@@ -486,7 +578,6 @@
                 on:click={() => {
                   programSelected = "";
                   instituteSelected = "";
-                  deanInstituteSelected = "";
                   documentSelected = value.name;
                   selectedID = value.id;
                 }}
@@ -502,24 +593,51 @@
           </Dropdown>
           {#if documentSelected === "Faculty Loading"}
             <p class="routes" class:dark={$dark}>
-              Route: Program Head / Dean Office / Academic VP
+              {#if $userData.unit === "Program Head"}
+                Route: Dean Office / Academic VP
+              {:else if $userData.unit === "Dean Office"}
+                Route: Academic VP
+              {:else}
+                Route: Program Head / Dean Office / Academic VP
+              {/if}
             </p>
           {:else if documentSelected === "Requested Subject"}
             <p class="routes" class:dark={$dark}>
-              Route: Program Head / Dean Office / Academic VP
+              {#if $userData.unit === "Program Head"}
+                Route: Dean Office / Academic VP
+              {:else if $userData.unit === "Dean Office"}
+                Route: Academic VP
+              {:else}
+                Route: Program Head / Dean Office / Academic VP
+              {/if}
             </p>
           {:else if documentSelected === "Endorsement Form"}
             <p class="routes" class:dark={$dark}>
-              Route: Program Head / Dean Office / Academic VP / OP
+              {#if $userData.unit === "Program Head"}
+                Route: Dean Office / Academic VP / OP
+              {:else if $userData.unit === "Dean Office"}
+                Route: Academic VP / OP
+              {:else}
+                Route: Program Head / Dean Office / Academic VP
+              {/if}
+            </p>
+          {:else if customDocumentname.length}
+            <p class="routes" class:dark={$dark}>
+              Route:
+              {#each selectedRoutes as route, i (i)}
+                {route.name} /
+              {/each}
             </p>
           {/if}
         </div>
-        {#if documentSelected.length && selectedID !== 4}
-          <Button
-            on:click={() => {
-              openRoutes = !openRoutes;
-            }}>Specify Route</Button
-          >
+        {#if $userData.unit !== "Program Head"}
+          {#if documentSelected.length && selectedID !== 4}
+            <Button
+              on:click={() => {
+                openRoutes = !openRoutes;
+              }}>Specify Route</Button
+            >
+          {/if}
         {/if}
       </div>
 
@@ -658,6 +776,110 @@
     place-items: center;
     z-index: 5;
     background-color: rgba(0, 0, 0, 0.6);
+
+    & div.main-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      column-gap: 1rem;
+
+      & div.custom-document-wrapper {
+        background-color: #fff;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        max-width: 500px;
+        width: 100%;
+
+        & div.selected-wrapper {
+          position: relative;
+          margin-bottom: 1rem;
+          width: 100%;
+
+          & div.selected {
+            transition: all ease-in-out 300ms;
+            border: 1px solid var(--header-color);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            color: var(--scroll-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+
+            & p {
+              font-weight: 700;
+            }
+          }
+
+          & div.selected:hover {
+            border-color: var(--border-hover-color);
+          }
+
+          & div.dark {
+            border-color: var(--input-color);
+            color: var(--background);
+          }
+
+          & li.list-wrapper {
+            & span.document-name {
+              font-weight: 400;
+            }
+
+            & span.document-name.dark {
+              color: var(--header-color);
+            }
+
+            & span.document-name.active {
+              color: var(--icon-active-color);
+            }
+          }
+
+          & li.active {
+            background-color: var(--component-active);
+          }
+
+          & li.active.dark {
+            background-color: var(--dark-main-col-5);
+          }
+
+          & li.list-wrapper:hover span.document-name {
+            color: var(--scroll-color);
+          }
+        }
+
+        & div.button-wrapper {
+          display: flex;
+          align-items: center;
+          column-gap: 0.5rem;
+        }
+      }
+
+      & div.summary-wrapper {
+        max-width: 300px;
+        width: 100%;
+        background-color: #fff;
+        padding: 1rem;
+        border-radius: 0.5rem;
+
+        & h1 {
+          font-weight: bold;
+          font-size: 1.2rem;
+        }
+
+        & div.selected-route-wrapper {
+          margin-top: 1rem;
+
+          & p {
+            display: inline-block;
+            padding-inline: 0.5rem;
+            margin: 0.2rem;
+            cursor: pointer;
+            border-radius: 1rem;
+            border: 1px solid lightgray;
+          }
+        }
+      }
+    }
 
     & div.select-route {
       padding: 2rem;

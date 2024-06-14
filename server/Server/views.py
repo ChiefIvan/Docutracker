@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from datetime import datetime
 from typing import List
 
-from .models import User, Revoked, Documents, Route, Notification
+from .models import User, Revoked, Documents, Route, Notification, Activity
 from .static.predef_function.user_validation import Sanitizer, RegisterEntryValidator
 from .static.predef_function.image_compressor import compress_image
 from . import db
@@ -81,6 +81,7 @@ def get_all_documents() -> dict:
     data = {}
 
     user: User = User.query.filter_by(id=current_user).first()
+    activity: Activity = Activity.query.filter_by(user_id=user.id).all()
 
     if user:
         data = {
@@ -93,7 +94,11 @@ def get_all_documents() -> dict:
             "EmployeeID": user.employee_id,
             "unit": user.designation,
             "full_ver_val": user.verified,
-            "registeredDate": user.registered_date
+            "registeredDate": user.registered_date,
+            "activity": [{
+                "content": act.content,
+                "date": act.date,
+            } for act in activity]
         }
 
     if user.previlage == "Secretary":
@@ -160,6 +165,7 @@ def get_all_documents() -> dict:
 def document_approval() -> dict:
     if request.method == "POST":
         data = request.json
+        current_user = get_jwt_identity()
         print(data)
         document: Documents = Documents.query.filter_by(
             code=data["codeData"]).first()
@@ -171,6 +177,8 @@ def document_approval() -> dict:
             document_id=document.id, name=data["unit"]).first()
         notification: Notification = Notification.query.filter_by(
             document_id=document.id).first()
+        activity: Activity = Activity.query.filter_by(
+            user_id=current_user).first()
 
         if data["approval"] == "approved":
             new_route: Route = Route(
@@ -199,6 +207,13 @@ def document_approval() -> dict:
                 document_id=document.id,
             )
 
+            new_activity: Activity = Activity(
+                content=f"You approved {data['name']}'s {data['documentName']}!",
+                date=datetime.now(),
+                user_id=current_user,
+            )
+
+            db.session.add(new_activity)
             db.session.add(new_notification)
             db.session.commit()
 
@@ -226,12 +241,19 @@ def document_approval() -> dict:
             db.session.add(new_route)
 
             new_notification: Notification = Notification(
-                title="Rejected",
-                body=f"Your {document.name} has been Rejected!",
+                title="Return",
+                body=f"Your {document.name} has been Returned!",
                 date=datetime.now(),
                 document_id=document.id,
             )
 
+            new_activity: Activity = Activity(
+                content=f"You returned {data['name']}'s {data['documentName']}!",
+                date=datetime.now(),
+                user_id=current_user,
+            )
+
+            db.session.add(new_activity)
             db.session.add(new_notification)
             db.session.commit()
 
@@ -250,6 +272,13 @@ def document_approval() -> dict:
                 document_id=document.id,
             )
 
+            new_activity: Activity = Activity(
+                content=f"You confirmed {data['name']}'s {data['documentName']}!",
+                date=datetime.now(),
+                user_id=current_user,
+            )
+
+            db.session.add(new_activity)
             db.session.add(new_notification)
             db.session.commit()
 
@@ -257,6 +286,7 @@ def document_approval() -> dict:
             if not route:
                 return jsonify({"error": "There's no document, please register one first!"})
 
+            route.remarks = data["remarks"]
             route.confirmed = True
             route.confirmed_date = datetime.now()
             route.finished = True
@@ -268,6 +298,14 @@ def document_approval() -> dict:
                 date=datetime.now(),
                 document_id=document.id,
             )
+
+            new_activity: Activity = Activity(
+                content=f"You finished {data['name']}'s {data['documentName']}!",
+                date=datetime.now(),
+                user_id=current_user,
+            )
+
+            db.session.add(new_activity)
 
             db.session.add(new_notification)
             db.session.commit()
@@ -286,14 +324,25 @@ def document_approval() -> dict:
                 document_id=document.id,
             )
 
+            new_activity: Activity = Activity(
+                content=f"You complete {data['name']}'s {data['documentName']}!",
+                date=datetime.now(),
+                user_id=current_user,
+            )
+
+            db.session.add(new_activity)
+
             db.session.add(new_notification)
             db.session.commit()
 
         else:
-            if not route:
+            rej_route: Route = Route.query.filter_by(
+                document_id=document.id).first()
+
+            if not rej_route:
                 return jsonify({"error": "There's no document, please register one first!"})
 
-            db.session.delete(route)
+            db.session.delete(rej_route)
             document.attemp += 1
 
             db.session.commit()
@@ -451,13 +500,13 @@ def document_register():
         print(data)
 
         entry_validate: RegisterEntryValidator = RegisterEntryValidator(
-            code, document_name, document_program, document_institute, dean_institute, description).validate()
+            code, document_name, description).validate()
 
         if isinstance(entry_validate, dict):
             return jsonify(entry_validate)
 
         sanitize: bool | dict = Sanitizer(
-            {"Document Name": document_name, "Document Program": document_program, "Document Institute": document_institute, "Document Code": code,
+            {"Document Name": document_name, "Document Code": code,
                 "Document Descripttion": description}
         ).validate()
 

@@ -37,6 +37,13 @@ class User(db.Model):
     document_access = db.relationship("Documents")
 
 
+class Activity(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.String(50), nullable=False)
+    date = db.Column(db.DateTime(), default=func.now())
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+
+
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     identifier = db.Column(db.String(120), nullable=False)

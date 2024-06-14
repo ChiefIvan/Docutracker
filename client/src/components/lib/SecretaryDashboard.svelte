@@ -67,8 +67,24 @@
           if (!doc.documentPath.length) {
             if (
               $userData.unit === "Program Head" &&
+              !["Program Head", "Dean Office"].includes(user.unit) &&
               $userData.institute === doc.documentInstitute &&
               $userData.program === doc.documentProgram
+            ) {
+              if (
+                doc.documentName === "Faculty Loading" ||
+                doc.documentName === "Requested Subject" ||
+                doc.documentName === "Endorsement Form" ||
+                doc.documentName === "Application for Leave"
+              ) {
+                return true;
+              }
+            }
+
+            if (
+              $userData.unit === "Dean Office" &&
+              user.designation === "Program Head" &&
+              $userData.institute === doc.deanInstitute
             ) {
               if (
                 doc.documentName === "Faculty Loading" ||
@@ -83,8 +99,24 @@
             return false;
           } else if (doc.documentPath.length) {
             if (
-              doc.documentPath[doc.documentPath.length - 1].name ===
-                "Program Head" &&
+              $userData.unit ===
+                doc.documentPath[doc.documentPath.length - 1].name &&
+              doc.documentPath[doc.documentPath.length - 1].approved &&
+              !doc.documentPath[doc.documentPath.length - 1].confirmed
+            ) {
+              console.log(doc.documentPath[doc.documentPath.length - 1].name);
+              if (
+                doc.documentName === "Faculty Loading" ||
+                doc.documentName === "Requested Subject" ||
+                doc.documentName === "Endorsement Form"
+              ) {
+                return true;
+              }
+            }
+
+            if (
+              $userData.unit ===
+                doc.documentPath[doc.documentPath.length - 1].name &&
               doc.documentPath[doc.documentPath.length - 1].approved &&
               !doc.documentPath[doc.documentPath.length - 1].confirmed
             ) {
@@ -300,6 +332,12 @@
     //   insName = name;
     // }
   };
+
+  let showLogs = false;
+
+  $: logs = $userData.activity;
+
+  let openLogModal = false;
 </script>
 
 <!-- <SecNav></SecNav> -->
@@ -307,116 +345,133 @@
   <DocumentModal {authToken}></DocumentModal>
 {/if}
 
-<main>
+<button type="button" class="show-logs" on:click={() => (showLogs = !showLogs)}>
+  Show Activity Logs
+</button>
+
+{#if openLogModal}
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-  {#if documents && documents.length}
-    <div class="filter">
-      {#if $filterName === "Self"}
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <div
+    class="overlay"
+    transition:fade
+    on:click|self={() => (openLogModal = false)}
+  >
+    <div class="modal-wrapper"></div>
+  </div>
+{/if}
+
+<main>
+  {#if !showLogs}
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    {#if documents && documents.length}
+      <div class="filter">
+        {#if $filterName === "Self"}
+          <!-- svelte-ignore a11y-no-static-element-interactions -->
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <div
+            class="filter-wrapper"
+            transition:fade
+            class:dark={$dark}
+            on:click|stopPropagation={() => {
+              $sortExpand = !$sortExpand;
+              $filterExpand = false;
+            }}
+            use:tooltip={{
+              content: "Sort",
+              animation: "perspective-subtle",
+              theme: "tooltip",
+              arrow: true,
+              offset: [0, 15],
+            }}
+          >
+            <span class="sort-name"> {sortName} </span>
+            <TriangleIcon
+              customDark={true}
+              rotate={$sortExpand}
+              on:click={() => {
+                $sortExpand = !$sortExpand;
+                $filterExpand = false;
+              }}
+            ></TriangleIcon>
+          </div>
+          <Dropdown expand={$sortExpand} self={true}>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+            <li on:click={() => switchSortname("Default")}>
+              <span class="mode-name" class:active={sortName === "Default"}
+                >Default</span
+              >
+            </li>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+            <li on:click={() => switchSortname("Date")}>
+              <span class="mode-name" class:active={sortName === "Date"}
+                >Date</span
+              >
+            </li>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+            <li on:click={() => switchSortname("Name")}>
+              <span class="mode-name" class:active={sortName === "Name"}
+                >Name</span
+              >
+            </li>
+          </Dropdown>
+        {/if}
         <div
           class="filter-wrapper"
-          transition:fade
           class:dark={$dark}
           on:click|stopPropagation={() => {
-            $sortExpand = !$sortExpand;
-            $filterExpand = false;
+            $filterExpand = !$filterExpand;
+            $sortExpand = false;
           }}
           use:tooltip={{
-            content: "Sort",
+            content: "Filter",
             animation: "perspective-subtle",
             theme: "tooltip",
             arrow: true,
             offset: [0, 15],
           }}
         >
-          <span class="sort-name"> {sortName} </span>
+          <span class="sort-name">
+            {insName.length ? insName : $filterName}
+          </span>
           <TriangleIcon
             customDark={true}
-            rotate={$sortExpand}
+            rotate={$filterExpand}
             on:click={() => {
-              $sortExpand = !$sortExpand;
-              $filterExpand = false;
+              $filterExpand = !$filterExpand;
+              $sortExpand = false;
             }}
           ></TriangleIcon>
+          <Dropdown expand={$filterExpand} secretary={true}>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+            <li on:click={() => switchFiltername("All")}>
+              <span class="mode-name" class:active={$filterName === "All"}
+                >All</span
+              >
+            </li>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+            <li on:click={() => switchFiltername("Self")}>
+              <span class="mode-name" class:active={$filterName === "Self"}
+                >Self</span
+              >
+            </li>
+          </Dropdown>
         </div>
-        <Dropdown expand={$sortExpand} self={true}>
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-          <li on:click={() => switchSortname("Default")}>
-            <span class="mode-name" class:active={sortName === "Default"}
-              >Default</span
-            >
-          </li>
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-          <li on:click={() => switchSortname("Date")}>
-            <span class="mode-name" class:active={sortName === "Date"}
-              >Date</span
-            >
-          </li>
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-          <li on:click={() => switchSortname("Name")}>
-            <span class="mode-name" class:active={sortName === "Name"}
-              >Name</span
-            >
-          </li>
-        </Dropdown>
-      {/if}
-      <div
-        class="filter-wrapper"
-        class:dark={$dark}
-        on:click|stopPropagation={() => {
-          $filterExpand = !$filterExpand;
-          $sortExpand = false;
-        }}
-        use:tooltip={{
-          content: "Filter",
-          animation: "perspective-subtle",
-          theme: "tooltip",
-          arrow: true,
-          offset: [0, 15],
-        }}
-      >
-        <span class="sort-name">
-          {insName.length ? insName : $filterName}
-        </span>
-        <TriangleIcon
-          customDark={true}
-          rotate={$filterExpand}
-          on:click={() => {
-            $filterExpand = !$filterExpand;
-            $sortExpand = false;
-          }}
-        ></TriangleIcon>
-        <Dropdown expand={$filterExpand} secretary={true}>
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-          <li on:click={() => switchFiltername("All")}>
-            <span class="mode-name" class:active={$filterName === "All"}
-              >All</span
-            >
-          </li>
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-          <li on:click={() => switchFiltername("Self")}>
-            <span class="mode-name" class:active={$filterName === "Self"}
-              >Self</span
-            >
-          </li>
-        </Dropdown>
       </div>
-    </div>
-    <UserCard filteredArray={documents} {route}></UserCard>
-  {:else}
-    <h1 class="empty-message" class:dark={$dark}>
-      You don't have any transactions yet!
-    </h1>
-  {/if}
+      <UserCard filteredArray={documents} {route}></UserCard>
+    {:else}
+      <h1 class="empty-message" class:dark={$dark}>
+        You don't have any transactions yet!
+      </h1>
+    {/if}
 
-  <!-- {#if $activeTab === "Forward"}
+    <!-- {#if $activeTab === "Forward"}
     {#if !forwardedDocuments.length}
       There's no Forwarded Documents yet!
     {:else}
@@ -446,6 +501,23 @@
       <UserCard filteredArray={completeDocuments} {route}></UserCard>
     {/if}
   {/if} -->
+  {:else}
+    <h1 class="act">Activity Logs</h1>
+    <div class="logs-wrapper">
+      {#if logs && logs.length}
+        <ul class="logs">
+          {#each logs.reverse() as log}
+            <li>
+              <p>{log.content}</p>
+              <p>{log.date}</p>
+            </li>
+          {/each}
+        </ul>
+      {:else}
+        <h1>You don't have any Logs yet!</h1>
+      {/if}
+    </div>
+  {/if}
 </main>
 
 <style>
@@ -462,9 +534,72 @@
     color: var(--background);
   }
 
+  button.show-logs {
+    border-radius: 5rem;
+    padding-inline: 2rem;
+    padding-block: 0.5rem;
+    position: fixed;
+    top: 3.5rem;
+    right: 0.5rem;
+    background-color: transparent;
+    border: 1px solid lightgray;
+    transition: all ease-in-out 300ms;
+  }
+
+  button.show-logs:hover {
+    cursor: pointer;
+    background-color: rgb(229, 229, 229);
+  }
+
+  /* div.overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    row-gap: 0.5rem;
+    z-index: 11;
+    background-color: rgba(0, 0, 0, 0.7);
+
+    & div.modal-wrapper {
+      border-radius: 0.5rem;
+      max-width: 50rem;
+      width: 100%;
+      padding: 1rem;
+      background-color: var(--background);
+    }
+  } */
+
   main {
     max-width: 1300px;
     margin: auto;
+
+    & h1.act {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-top: 3rem;
+    }
+
+    & div.logs-wrapper {
+      margin-top: 2rem;
+
+      & ul.logs {
+        & li {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.5rem;
+          transition: all ease-in-out 300ms;
+        }
+
+        & li:hover {
+          cursor: pointer;
+          background-color: lightgray;
+          border-radius: 0.5rem;
+        }
+      }
+    }
 
     & div.filter {
       display: flex;
@@ -474,6 +609,7 @@
       column-gap: 0.5rem;
       margin-bottom: 1.5rem;
       transition: all ease-in-out 500ms;
+      margin-top: 3rem;
 
       & div.filter-wrapper {
         width: 6rem;

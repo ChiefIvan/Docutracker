@@ -27,7 +27,13 @@
           {#if (document.documentPath.length && document.documentPath[document.documentPath.length - 1].name === $userData.unit && document.documentPath.length && document.documentPath[document.documentPath.length - 1].approved && !document.documentPath[document.documentPath.length - 1].confirmed) || (document.documentPath.length && document.documentPath[document.documentPath.length - 1].name !== $userData.unit && document.documentPath[document.documentPath.length - 1].approved && document.documentPath[document.documentPath.length - 1].confirmed && !document.documentPath[document.documentPath.length - 1].complete)}
             <li
               on:click={() => {
-                handleDetails(user.fullName, user.email, document, "tab1");
+                handleDetails(
+                  user.fullName,
+                  user.email,
+                  user.designation,
+                  document,
+                  "tab1"
+                );
                 console.log(document);
               }}
             >
@@ -43,10 +49,16 @@
                 </div>
               </div>
             </li>
-          {:else if !document.documentPath.length && $userData.unit === "Program Head" && $userData.institute === document.documentInstitute && $userData.program === document.documentProgram}
+          {:else if (!document.documentPath.length && $userData.unit === "Program Head" && $userData.institute === document.documentInstitute && $userData.program === document.documentProgram) || (!document.documentPath.length && $userData.unit === "Dean Office" && user.designation === "Program Head" && $userData.institute === document.deanInstitute)}
             <li
               on:click={() => {
-                handleDetails(user.fullName, user.email, document, "tab1");
+                handleDetails(
+                  user.fullName,
+                  user.email,
+                  user.designation,
+                  document,
+                  "tab1"
+                );
                 console.log(document);
               }}
             >

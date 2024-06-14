@@ -53,7 +53,7 @@ class Flaskserver:
         mail.init_app(self.server)
         jwt.init_app(self.server)
 
-        from .models import User, Captcha, Revoked, Resend, Reset, Template, Documents
+        from .models import User, Captcha, Revoked, Resend, Reset, Template, Documents, Activity
         from .authentication import auth
         from .views import views
 

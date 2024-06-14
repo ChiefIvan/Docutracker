@@ -171,12 +171,14 @@ export const sortArray = (array: Document[], sortName: string): Document[] => {
 export const handleDetails = (
   userName: string,
   email: string,
+  unit: string,
   document: Document,
   confirmed?: string
 ) => {
   documentDetails.set({
     documentDetails: false,
     userNameD: userName,
+    unitD: unit,
     emailD: email,
     confirmedD: confirmed && confirmed.length ? confirmed.length : 0,
     documentD: document,
@@ -268,6 +270,7 @@ export const notifications: Writable<Notification[]> = writable([]);
 export const documentDetails = writable({
   documentDetails: false,
   userNameD: "",
+  unitD: "",
   emailD: "",
   confirmedD: 0,
   documentD: {},
@@ -291,3 +294,4 @@ export const dark = writable(false);
 export const detailsExpand = writable(false);
 export const sortExpand = writable(false);
 export const actionExpand = writable(false);
+export const selectRouteExpand = writable(false);

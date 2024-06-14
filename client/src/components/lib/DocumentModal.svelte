@@ -27,22 +27,28 @@
   const approvalRequest: RequestAPI = {
     method: "POST",
     address: `${address}/document_approval`,
-    credentoials: {
+    credentials: {
       approval: "",
       unit: "",
+      name: "",
+      documentName: "",
       codeData: "",
       comment: "",
       remarks: "",
     },
   };
 
-  $: console.log($documentDetails.documentD.documentPath);
   const handleApproval = async (args: string) => {
     approvalRequest.credentials!.approval = args;
     approvalRequest.credentials!.unit = $userData.unit;
+    approvalRequest.credentials!.documentName =
+      $documentDetails.documentD.documentName;
+    approvalRequest.credentials!.name = $userData.fullName;
     approvalRequest.credentials!.codeData = $documentDetails.documentD.codeData;
     approvalRequest.credentials!.comment = commentValue;
     approvalRequest.credentials!.remarks = remarksValue;
+
+    console.log(approvalRequest);
 
     const response: ResponseData = await handleFetch(
       approvalRequest,
@@ -208,9 +214,21 @@
           <p class="description">Route</p>
           <section>
             {#if $documentDetails.documentD.documentName === "Faculty Loading"}
-              Program Head / Dean Office / Academic VP
+              {#if $documentDetails.unitD == "Program Head"}
+                Dean Office / Academic VP
+              {:else if $documentDetails.unitD == "Dean Office"}
+                Academic VP
+              {:else}
+                Program Head / Dean Office / Academic VP
+              {/if}
             {:else if $documentDetails.documentD.documentName === "Requested Subject"}
-              Program Head / Dean Office / Academic VP
+              {#if $documentDetails.unitD == "Program Head"}
+                Dean Office / Academic VP
+              {:else if $documentDetails.unitD == "Dean Office"}
+                Academic VP
+              {:else}
+                Program Head / Dean Office / Academic VP
+              {/if}
             {:else if $documentDetails.documentD.documentName === "Application for Leave"}
               {#if $userData.previlage === "User"}
                 {#if $userData.unit === "Program Head"}
@@ -235,8 +253,14 @@
                   {/each}
                 {/if}
               {/if}
-            {:else}
-              Program Head / Dean Office / Academic VP / OP
+            {:else if $documentDetails.documentD.documentName === "Endorsement Form"}
+              {#if $documentDetails.unitD == "Program Head"}
+                Dean Office / Academic VP
+              {:else if $documentDetails.unitD == "Dean Office"}
+                Academic VP
+              {:else}
+                Program Head / Dean Office / Academic VP
+              {/if}
             {/if}
           </section>
         </div>
@@ -256,7 +280,18 @@
             </div>
           {/if}
         {/if}
+        {#if $documentDetails.documentD.documentPath.length}
+          {#each $documentDetails.documentD.documentPath as path}
+            {#if path.remarks}
+              <div class="description-wrapper">
+                <p class="description">Remarks</p>
+                <section>{path.remarks}</section>
+              </div>
+            {/if}
+          {/each}
+        {/if}
       </div>
+
       {#if $documentDetails.documentD.codeData}
         {@const value = $documentDetails.documentD.codeData}
         <div class="code-wrapper">
