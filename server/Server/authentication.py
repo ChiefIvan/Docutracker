@@ -200,11 +200,11 @@ def signup() -> dict:
 
         image = compress_image(user_credentials["userImg"], quality=70)
 
-        # smt: Smt | None = Smt(db=db, resend=Resend, reset=Reset, server=server, mail=mail, access="auth.confirm_email",
-        #                       data=user_email, username=user_credentials["fullName"]).send()
+        smt: Smt | None = Smt(db=db, resend=Resend, reset=Reset, server=server, mail=mail, access="auth.confirm_email",
+                              data=user_email, username=user_credentials["fullName"]).send()
 
-        # if isinstance(smt, dict):
-        #     return jsonify(smt)
+        if isinstance(smt, dict):
+            return jsonify(smt)
 
         try:
             new_user: User = User(

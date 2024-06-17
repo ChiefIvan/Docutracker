@@ -7,8 +7,8 @@
   import Button from "../shared/Button.svelte";
   import QrCode from "svelte-qrcode";
   import pdfMake from "pdfmake/build/pdfmake";
-  import pdfFonts from "pdfmake/build/vfs_fonts";
-  (<any>pdfMake).vfs = pdfFonts.pdfMake.vfs;
+  // import pdfFonts from "pdfmake/build/vfs_fonts";
+  // (<any>pdfMake).vfs = pdfFonts.pdfMake.vfs;
 
   onMount(async () => {
     const lib = await import("pdfmake/build/vfs_fonts");
